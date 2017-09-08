@@ -1,10 +1,13 @@
 # MUDT1
 
 Especialização em Desenvolvimento de Jogos Digitais
+
 Redes Aplicadas a Jogos - 2017/2
+
 Trabalho 1 - MUD
-Descrição
+
 O trabalho consiste no desenvolvimento de um jogo multiplayer estilo MUD (“Multi-user Dungeon”) com as seguintes características:
+
 -> Modelo cliente-servidor implementado na Unity;
 -> Implementação de um servidor que contenha toda a lógica de gameplay;
 -> Implementação de um cliente que permite especificar o endereço para a conexão e a partir daí conectar para enviar e receber mensagens textuais;
