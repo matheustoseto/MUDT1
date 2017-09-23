@@ -64,6 +64,7 @@ public class Player
 {
     public string idPlayer;
     public string nome;
+    public IdSalas idSala;
 }
 //------------------------------
 
@@ -79,13 +80,18 @@ public class Sala
 }
 //------------------------------
 
+ public class Inventario
+{
+    public string idPlayer;
+    public List<Objeto> objetos;
+}
+
 public class Repositorio : MonoBehaviour
 {
     public List<Objeto> objetos;
     public List<Player> players;
     public List<Sala> salas;
-
-    public Dictionary<Sala, List<Player>> salaComPlayers;
+    public List<Inventario> inventarios;
 
     // Use this for initialization
     protected void Start()
