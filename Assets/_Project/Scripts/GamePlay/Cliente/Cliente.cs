@@ -62,8 +62,10 @@ public class Cliente : MonoBehaviour
                 GUILayout.Label("idPlayer: " + idPlayer);
                 GUILayout.Label("Ping: " + Network.GetAveragePing(Network.connections[0]));
 
-                if (GUILayout.Button("Desconectar"))
-                    Network.Disconnect(200);
+                if (GUILayout.Button("Desconectar")) {
+                    netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!");
+                    Network.Disconnect(200);       
+                }
 
                 textChat = GUILayout.TextField(textChat, GUILayout.MinWidth(100));
 
@@ -78,7 +80,7 @@ public class Cliente : MonoBehaviour
 
     void DigitarTexto(string texto)
     {
-        ShowText(playerName , texto);
+        netWorkView.RPC("ShowText", RPCMode.All, playerName, texto);
         netWorkView.RPC("Comando", RPCMode.Server, idPlayer, texto);
     }
 
@@ -90,9 +92,10 @@ public class Cliente : MonoBehaviour
     }
 
     [RPC]
-    void SetIdPlayer(string idPlayer)
+    void SetIdPlayer(string playerName, string idPlayer)
     {
-        this.idPlayer = idPlayer;
+        if(this.playerName == playerName)
+            this.idPlayer = idPlayer;
     }
 
     [RPC]
@@ -104,6 +107,13 @@ public class Cliente : MonoBehaviour
             chatEntries.Add(texto);
 
         textChat = "";
+    }
+
+    [RPC]
+    void Sendmsg(string idPlayer, string texto)
+    {
+        if (this.idPlayer == idPlayer)
+            ShowText("", texto);
     }
 
     //Server function

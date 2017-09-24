@@ -8,6 +8,7 @@ public class Servidor : MonoBehaviour
     public int connectPort = 25001;
     private NetworkView netWorkView;
     private Repositorio repositorio = new Repositorio();
+    private Command comandos = new Command();
 
     // Use this for initialization
     void Start()
@@ -119,13 +120,14 @@ public class Servidor : MonoBehaviour
         repositorio.players.Add(player);
 
         NotificaTodosPlayers("", "Jogador " + name + " se connectou!");
-        info.networkView.RPC("SetIdPlayer", RPCMode.Server, player.idPlayer);
+        info.networkView.RPC("SetIdPlayer", RPCMode.All, name, player.idPlayer);
     }
 
     [RPC]
     void Comando(string idPlayer, string texto)
     {
-
+        string retorno = comandos.falarChat(texto);
+        notificaPlayer(idPlayer, retorno);
     }
 
     void NotificaTodosPlayers(string nomePlayer, string texto)
@@ -133,11 +135,17 @@ public class Servidor : MonoBehaviour
         netWorkView.RPC("ShowText", RPCMode.All, nomePlayer, texto);
     }
 
+    void notificaPlayer(string nomePlayer, string texto)
+    {
+        netWorkView.RPC("Sendmsg", RPCMode.All, nomePlayer, texto);
+    }
+
     //Client function
     //As funções do cliente devem ser declaradas no servidor porém vazias
     [RPC]
-    void SetIdPlayer(string idPlayer){}
+    void SetIdPlayer(string playerName, string idPlayer) {}
     [RPC]
-    void ShowText(string nomePlayer, string texto){}
-
+    void ShowText(string nomePlayer, string texto) {}
+    [RPC]
+    void Sendmsg(string idPlayer, string texto) {}
 }

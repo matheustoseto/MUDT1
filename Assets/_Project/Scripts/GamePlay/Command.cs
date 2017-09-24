@@ -4,9 +4,6 @@ using System;
 
 public class Command : MonoBehaviour {
 
-    [SerializeField] private ChatMudUI mudUI;
-    [SerializeField] private string namePlayer = "Player";
-
     private Repositorio repositorio;
 
 	// Use this for initialization
@@ -18,12 +15,6 @@ public class Command : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    public void GetCommand()
-    {
-        mudUI.LogText += "["+namePlayer+"]: " + falarChat(mudUI.Command.text) + "\n";
-        mudUI.Command.text = "";
-    }
 
     public string falarChat(string texto)
     {
