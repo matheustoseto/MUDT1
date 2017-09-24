@@ -79,15 +79,6 @@ public class Command : MonoBehaviour {
         return "Não Foi Possível Realizar Essa Ação.";
     }
 
-    public void acessouJogo(string nome)
-    {
-        Player player = new Player();
-        player.idPlayer = Guid.NewGuid().ToString("N");
-        player.nome = nome;
-
-        repositorio.players.Add(player);
-    }
-
     public string usarObjeto(TipoObjeto objeto, TipoObjeto alvo)
     {
 

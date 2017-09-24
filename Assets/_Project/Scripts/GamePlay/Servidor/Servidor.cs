@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Servidor : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Servidor : MonoBehaviour
     private NetworkView netWorkView;
     private Repositorio repositorio = new Repositorio();
     private Command comandos = new Command();
+
+    private List<string> chatEntries = new List<string>();
 
     // Use this for initialization
     void Start()
@@ -58,6 +61,9 @@ public class Servidor : MonoBehaviour
             {
                 Network.Disconnect(200);
             }
+
+            foreach (string tx in chatEntries)
+                GUILayout.Label(tx);
         }
     }
 
@@ -119,13 +125,18 @@ public class Servidor : MonoBehaviour
 
         repositorio.players.Add(player);
 
-        NotificaTodosPlayers("", "Jogador " + name + " se connectou!");
+        string txt = "Jogador " + name + " se connectou!";
+
+        NotificaTodosPlayers("", txt);
+        AdicionaTexto("", txt);
+        
         info.networkView.RPC("SetIdPlayer", RPCMode.All, name, player.idPlayer);
     }
 
     [RPC]
     void Comando(string idPlayer, string texto)
     {
+        AdicionaTexto(repositorio.BuscarPlayer(idPlayer).nome, texto);
         string retorno = comandos.falarChat(texto);
         notificaPlayer(idPlayer, retorno);
     }
@@ -138,6 +149,14 @@ public class Servidor : MonoBehaviour
     void notificaPlayer(string nomePlayer, string texto)
     {
         netWorkView.RPC("Sendmsg", RPCMode.All, nomePlayer, texto);
+    }
+
+    void AdicionaTexto(string nomePlayer, string texto)
+    {
+        if(nomePlayer != "")
+            chatEntries.Add("[" + nomePlayer + "]" + texto);
+        else
+            chatEntries.Add(texto);
     }
 
     //Client function

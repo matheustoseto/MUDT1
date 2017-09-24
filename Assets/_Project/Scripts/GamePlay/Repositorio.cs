@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public enum TipoObjeto
 {
@@ -68,5 +69,14 @@ public class Repositorio : MonoBehaviour
     protected void Update()
     {
 
+    }
+
+    public Player BuscarPlayer(string idPlayer)
+    {
+        Player player = (from item in players
+                         where item.idPlayer == idPlayer
+                         select item).First();
+
+        return player;
     }
 }
