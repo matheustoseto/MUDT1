@@ -7,9 +7,6 @@ using System.Linq;
 
 public class Command : MonoBehaviour {
 
-    [SerializeField] private ChatMudUI mudUI;
-    [SerializeField] private string namePlayer = "Player";
-
     private Repositorio repositorio;
 
 	// Use this for initialization
