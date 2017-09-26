@@ -37,7 +37,8 @@ public enum Coordenadas
     Norte,
     Sul,
     Leste,
-    Oeste
+    Oeste,
+	Default
 }
 
 [System.Serializable]

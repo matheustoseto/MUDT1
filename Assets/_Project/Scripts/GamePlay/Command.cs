@@ -257,6 +257,6 @@ public class Command : MonoBehaviour {
 		if("O".contais(cd))
 			return Coordenadas.Oeste;
 		
-		return null;
+		return Coordenadas.Default;
 	}
 }
