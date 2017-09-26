@@ -47,7 +47,30 @@ public class Command : MonoBehaviour {
         else
         if ("Mover".Contains(texto))
         { // Mover [N/S/L/O]
-
+			splitTexto = texto.Split(null)[1];
+			
+			Sala salaAtual = (from item in repositorio.salas
+							  where item.idSala == player.idSala
+							  select item).First();
+							  
+			Coordenadas coordenada = BuscarCoordenada(splitTexto);
+			
+			IdSalas idSala = (from item in salaAtual.salasLigadas
+							  where item.coordenada == coordenada
+							  select item).First();
+			
+			if(idSala != null){
+				Sala salaMover = (from item in repositorio.salas
+								  where item.idSala == idSala
+								  select item).First();
+				foreach(Player pl in repositorio.players){
+					if(pl.idPlayer == player.idPlayer)
+						pl.idSala = salaMover.idSala;
+				}
+				servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
+			}
+				
+			servidor.notificaPlayer(player.idPlayer, "Não foi possivel mover para a sala descrita.");
         }
         else
         if ("Pegar".Contains(texto))
@@ -223,4 +246,17 @@ public class Command : MonoBehaviour {
                          select item).First();
         return player;
     }
+	
+	public Coordenadas BuscarCoordenada(string cd){
+		if("N".contais(cd))
+			return Coordenadas.Norte;
+		if("S".contais(cd))
+			return Coordenadas.Sul;
+		if("L".contais(cd))
+			return Coordenadas.Leste;
+		if("O".contais(cd))
+			return Coordenadas.Oeste;
+		
+		return null;
+	}
 }
