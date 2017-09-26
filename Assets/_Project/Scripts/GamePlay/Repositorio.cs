@@ -29,7 +29,8 @@ public enum IdSalas
     Sala2,
     Sala3,
     Sala4,
-    Sala5
+    Sala5,
+	Default
 }
 
 public enum Coordenadas

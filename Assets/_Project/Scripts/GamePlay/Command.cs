@@ -262,21 +262,23 @@ public class Command : MonoBehaviour {
 	public IdSalas BuscarIdSalas(string cd){
 		if("Sala1".contais(cd))
 			return IdSalas.Sala1;
-		if("Sala2".IdSalas(cd))
-			return Coordenadas.Sala2;
-		if("Sala3".IdSalas(cd))
-			return Coordenadas.Sala3;
-		if("Sala4".IdSalas(cd))
-			return Coordenadas.Sala4;
+		if("Sala2".contais(cd))
+			return IdSalas.Sala2;
+		if("Sala3".contais(cd))
+			return IdSalas.Sala3;
+		if("Sala4".contais(cd))
+			return IdSalas.Sala4;
+		if("Sala5".contais(cd))
+			return IdSalas.Sala5;
 		
-		return IdSalas.Sala5;
+		return IdSalas.Default;
 	}
 	
 	public void AdicionaObjetoSala(string cdSala, string texto){
 		
 		IdSalas idSala = BuscarIdSalas(cdSala);
 		
-		if(idSala == null){
+		if(idSala == IdSalas.Default){
 			servidor.AdicionaTextoByIdSala(idSala, "Sala não encontrado!");
 			return;
 		}
