@@ -19,6 +19,7 @@ public class Servidor : MonoBehaviour
 	public string objetoTextChat = "Digite o tipo do objeto.";
 	public string idSalaTextChat = "Digite o id da sala";
     private List<ChatEntries> chatEntries = new List<ChatEntries>();
+	private IdSalas idSalaAtual = IdSalas.Sala1;
 
     // Use this for initialization
     void Start()
@@ -79,11 +80,27 @@ public class Servidor : MonoBehaviour
 				objetoTextChat = "";
 				idSalaTextChat = "";
 			}
+			
+			if (GUILayout.Button(new Rect(0, 0, 50, 50),"Sala1"))
+				idSalaAtual = IdSalas.Sala1;
+			
+			if (GUILayout.Button(new Rect(60, 0, 50, 50),"Sala2"))
+				idSalaAtual = IdSalas.Sala2;
+			
+			if (GUILayout.Button(new Rect(120, 0, 50, 50),"Sala3"))
+				idSalaAtual = IdSalas.Sala3;
+			
+			if (GUILayout.Button(new Rect(180, 0, 50, 50),"Sala4"))
+				idSalaAtual = IdSalas.Sala4;
+			
+			if (GUILayout.Button(new Rect(240, 0, 50, 50),"Sala5"))
+				idSalaAtual = IdSalas.Sala5;
+			
             foreach (ChatEntries chat in chatEntries){
 				GUILayout.Label(chat.idSala);
-				foreach(string txt in chat.chat)
-					GUILayout.Label(tx);
-				GUILayout.Space(3);
+				if(chat.idSala = idSalaAtual)
+					foreach(string txt in chat.chat)
+						GUILayout.Label(tx);
 			}
                 
         }
