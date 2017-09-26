@@ -122,6 +122,7 @@ public class Servidor : MonoBehaviour
         player.idPlayer = "id_" + name;
         player.nome = name;
         player.networkPlayer = info.sender;
+		player.idSala = IdSalas.Sala1;
 
         repositorio.players.Add(player);
 
@@ -138,8 +139,7 @@ public class Servidor : MonoBehaviour
     {
         Player player = repositorio.BuscarPlayer(idPlayer);
         AdicionaTexto(player.nome, texto);
-        string retorno = comandos.falarChat(player, texto);
-        notificaPlayer(idPlayer, retorno);
+        comandos.falarChat(player, texto);
     }
 
     void NotificaTodosPlayers(string nomePlayer, string texto)
@@ -147,9 +147,9 @@ public class Servidor : MonoBehaviour
         netWorkView.RPC("ShowText", RPCMode.All, nomePlayer, texto);
     }
 
-    void notificaPlayer(string nomePlayer, string texto)
+    void notificaPlayer(string idPlayer, string texto)
     {
-        netWorkView.RPC("Sendmsg", RPCMode.All, nomePlayer, texto);
+        netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto);
     }
 
     void AdicionaTexto(string nomePlayer, string texto)

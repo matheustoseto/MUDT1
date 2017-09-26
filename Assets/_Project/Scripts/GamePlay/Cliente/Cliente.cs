@@ -80,7 +80,7 @@ public class Cliente : MonoBehaviour
 
     void DigitarTexto(string texto)
     {
-        netWorkView.RPC("ShowText", RPCMode.All, playerName, texto);
+        //netWorkView.RPC("ShowText", RPCMode.All, playerName, texto);
         netWorkView.RPC("Comando", RPCMode.Server, idPlayer, texto);
     }
 

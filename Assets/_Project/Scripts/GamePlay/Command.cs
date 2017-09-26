@@ -8,6 +8,7 @@ using System.Linq;
 public class Command : MonoBehaviour {
 
     private Repositorio repositorio;
+	private Servidor servidor;
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +20,7 @@ public class Command : MonoBehaviour {
 
 	}
 
-    public string falarChat(Player player, string texto)
+    public void falarChat(Player player, string texto)
     {
         if ("Examinar".Contains(texto))
         { // Examinar [sala/objeto]
@@ -30,7 +31,7 @@ public class Command : MonoBehaviour {
                         select item).First();
 
             if (sala != null)
-                return sala.descricao;
+                servidor.notificaPlayer(player.idPlayer, sala.descricao);
 
             Objeto objeto = (from item in repositorio.inventarios
                              where item.idPlayer == player.idPlayer
@@ -39,9 +40,9 @@ public class Command : MonoBehaviour {
                                      select obj).First()).First();
 
             if (objeto != null)
-                return objeto.descricao;
+                servidor.notificaPlayer(player.idPlayer, objeto.descricao);
 
-            return "Sala ou Objeto não encontrado.";
+            servidor.notificaPlayer(player.idPlayer, "Sala ou Objeto não encontrado.");
         }
         else
         if ("Mover".Contains(texto))
@@ -69,10 +70,10 @@ public class Command : MonoBehaviour {
                     if (sala.idSala == player.idSala)
                         sala.objetos.Remove(objeto.tipo);
 
-                return "Objeto adicionado no seu inventario.";
+                servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
             }
 
-            return "Objeto não encontrado na sala.";
+            servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
         }
         else
         if ("Largar".Contains(texto))
@@ -96,10 +97,10 @@ public class Command : MonoBehaviour {
                     if (sala.idSala == player.idSala)
                         sala.objetos.Add(objeto.tipo);
 
-                return "Objeto removido do inventario.";
+                servidor.notificaPlayer(player.idPlayer, "Objeto removido do inventario.");
             }
 
-            return "Objeto não foi encontrado no inventario.";
+            servidor.notificaPlayer(player.idPlayer, "Objeto não foi encontrado no inventario.");
         }
         else
         if ("Inventario".Contains(texto))
@@ -112,9 +113,9 @@ public class Command : MonoBehaviour {
             if (inventario != null) { 
                 foreach (Objeto obj in inventario.objetos)
                     objetos += obj.nome + " - ";
-                return objetos;
+                servidor.notificaPlayer(player.idPlayer, objetos);
             }
-            return "Inventario não encontrado.";
+            servidor.notificaPlayer(player.idPlayer, "Inventario não encontrado." );
         }
         else
         if ("Usar".Contains(texto))
@@ -123,23 +124,27 @@ public class Command : MonoBehaviour {
             Objeto objeto   = buscarObjeto(splitTexto[1]);
             Objeto alvo     = buscarObjeto(splitTexto[2]);
 
-            if (!verificaInventario(objeto))
-                return "Você não possui esse objeto.";
+            if (!verificaInventario(player, objeto))
+                servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
 
             if (objeto != null && alvo != null)
-                return usarObjetoAlvo(objeto.tipo, alvo.tipo);
+                servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
             else if (objeto != null)
-                return usarObjeto(objeto.tipo);
+                servidor.notificaPlayer(player.idPlayer, usarObjeto(objeto.tipo));
         }
         else
         if ("Falar".Contains(texto))
         { // Falar [texto]
-            return texto.Split(null)[1];
+            servidor.NotificaTodosPlayers(player.nome, texto.Split(null)[1]);
         }
         else
         if ("Cochichar".Contains(texto))
         { // Cochichar [texto] [jogador]
-
+			string splitTexto = texto.Split(null)[1];
+			string jogador = texto.Split(null)[2];
+			Player plyer = buscarPlayerByName(jogador);
+			
+			servidor.notificaPlayer(plyer.idPlayer, "O jogador " + player.nome + " enviou uma mensagem: " + splitTexto);
         }
         else
         if ("Ajuda".Contains(texto))
@@ -157,18 +162,15 @@ public class Command : MonoBehaviour {
         return "Não Foi Possível Realizar Essa Ação.";
     }
 
-    public void acessouJogo(string nome)
+    public bool verificaInventario(Player player, Objeto objeto)
     {
-        Player player = new Player();
-        player.idPlayer = Guid.NewGuid().ToString("N");
-        player.nome = nome;
-
-        repositorio.players.Add(player);
-    }
-
-    public bool verificaInventario(Objeto objeto)
-    {
-        return false;
+		Objeto obj = (from item in repositorio.inventario
+					  where item.idPlayer == player.idPlayer
+					  select (from objet in item.objetos
+							 where objet.tipo == objeto.tipo
+							 select objet).First()).First();
+							 
+        return (obj != null);
     }
 
     public string usarObjeto(TipoObjeto objeto)
@@ -200,10 +202,8 @@ public class Command : MonoBehaviour {
     public Objeto buscarObjeto(string objeto)
     {
         foreach (Objeto obj in repositorio.objetos)
-        {
-            if (obj.nome.Contains(objeto))
+			if (obj.nome.Contains(objeto))
                 return obj;
-        }
         return null;
     }
 
@@ -211,6 +211,15 @@ public class Command : MonoBehaviour {
     {
         Player player = (from item in repositorio.players
                          where item.idPlayer == idPlayer
+                         select item).First();
+        return player;
+    }
+	
+	
+    public Player buscarPlayerByName(string nome)
+    {
+        Player player = (from item in repositorio.players
+                         where item.nome == nome
                          select item).First();
         return player;
     }
