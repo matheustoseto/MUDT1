@@ -78,15 +78,15 @@ public class Sala
     public string nome;
     public string descricao;
     public IdSalas idSala;
-    public List<TipoObjeto> objetos;
-    public List<SalasLigadas> salasLigadas;
+    public List<TipoObjeto> objetos = new List<TipoObjeto>();
+    public List<SalasLigadas> salasLigadas = new List<SalasLigadas>();
 }
 //------------------------------
 
  public class Inventario
 {
     public string idPlayer;
-    public List<Objeto> objetos;
+    public List<Objeto> objetos = new List<Objeto>();
 }
 
 public class Repositorio : MonoBehaviour

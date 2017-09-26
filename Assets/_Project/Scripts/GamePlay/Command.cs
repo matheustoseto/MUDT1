@@ -149,6 +149,9 @@ public class Command : MonoBehaviour {
 
             if (!verificaInventario(player, objeto))
                 servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
+			
+			if (alvo != null && !verificaInventario(player, alvo))
+                servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
 
             if (objeto != null && alvo != null)
                 servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
@@ -222,12 +225,11 @@ public class Command : MonoBehaviour {
         return null;
     }
 
-    public Objeto buscarObjeto(string objeto)
+    public Objeto buscarObjeto(string nomeObjeto)
     {
-        foreach (Objeto obj in repositorio.objetos)
-			if (obj.nome.Contains(objeto))
-                return obj;
-        return null;
+        return (from item in repositorio.objetos
+				where item.nome == nomeObjeto
+				select item).First();
     }
 
     public Player buscarPlayerById(string idPlayer)
