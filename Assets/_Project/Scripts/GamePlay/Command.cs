@@ -169,7 +169,8 @@ public class Command : MonoBehaviour {
         else
         if ("Ajuda".Contains(texto))
         { // Ajuda
-            return "Lista de Comandos: \n"
+			
+            string ajuda =  "Lista de Comandos: \n"
                     + "Examinar [sala/objeto] \n"
                     + "Mover [N/S/L/O] \n"
                     + "Pegar [objeto] \n"
@@ -178,8 +179,11 @@ public class Command : MonoBehaviour {
                     + "Usar [objeto] {alvo} \n"
                     + "Falar [texto] \n"
                     + "Cochichar [texto] [jogador] \n";
-        }
-        return "Não Foi Possível Realizar Essa Ação.";
+					
+			servidor.notificaPlayer(player.idPlayer, ajuda);
+        }else{
+			servidor.notificaPlayer(player.idPlayer, "Não Foi Possível Realizar Essa Ação.");
+		}
     }
 
     public bool verificaInventario(Player player, Objeto objeto)
