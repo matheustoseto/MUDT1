@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public ChatEntries {
+public class ChatEntries {
 	public IdSalas idSala;
 	public List<string> chat = new List<string>();
 }
@@ -81,26 +81,26 @@ public class Servidor : MonoBehaviour
 				idSalaTextChat = "";
 			}
 			
-			if (GUILayout.Button(new Rect(0, 0, 50, 50),"Sala1"))
+			if (GUILayout.Button("Sala1"))
 				idSalaAtual = IdSalas.Sala1;
 			
-			if (GUILayout.Button(new Rect(60, 0, 50, 50),"Sala2"))
+			if (GUILayout.Button("Sala2"))
 				idSalaAtual = IdSalas.Sala2;
 			
-			if (GUILayout.Button(new Rect(120, 0, 50, 50),"Sala3"))
+			if (GUILayout.Button("Sala3"))
 				idSalaAtual = IdSalas.Sala3;
 			
-			if (GUILayout.Button(new Rect(180, 0, 50, 50),"Sala4"))
+			if (GUILayout.Button("Sala4"))
 				idSalaAtual = IdSalas.Sala4;
 			
-			if (GUILayout.Button(new Rect(240, 0, 50, 50),"Sala5"))
+			if (GUILayout.Button("Sala5"))
 				idSalaAtual = IdSalas.Sala5;
 			
             foreach (ChatEntries chat in chatEntries){
-				GUILayout.Label(chat.idSala);
-				if(chat.idSala = idSalaAtual)
+				GUILayout.Label(chat.idSala.ToString());
+				if(chat.idSala == idSalaAtual)
 					foreach(string txt in chat.chat)
-						GUILayout.Label(tx);
+						GUILayout.Label(txt);
 			}
                 
         }
@@ -176,17 +176,18 @@ public class Servidor : MonoBehaviour
     [RPC]
     void Comando(string idPlayer, string texto)
     {
+        Debug.Log(idPlayer);
         Player player = comandos.buscarPlayerById(idPlayer);
         AdicionaTexto(player, texto);
         comandos.falarChat(player, texto);
     }
 
-    void NotificaTodosPlayers(string nomePlayer, string texto)
+    public void NotificaTodosPlayers(string nomePlayer, string texto)
     {
         netWorkView.RPC("ShowText", RPCMode.All, nomePlayer, texto);
     }
 
-    void notificaPlayer(string idPlayer, string texto)
+    public void notificaPlayer(string idPlayer, string texto)
     {
         netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto);
     }
@@ -195,17 +196,20 @@ public class Servidor : MonoBehaviour
     {
 		foreach(ChatEntries ce in chatEntries){
 			if(ce.idSala == player.idSala)
-				ce.chat.Add("[" + player.nome + "]" + texto);
-			break;
+            {
+                ce.chat.Add("[" + player.nome + "]" + texto);
+                break;
+            }	
 		} 	  
     }
 	
-	void AdicionaTextoByIdSala(IdSalas idSala, string texto)
+	public void AdicionaTextoByIdSala(IdSalas idSala, string texto)
     {
 		foreach(ChatEntries ce in chatEntries){
-			if(ce.idSala == idSala)
-				ce.chat.Add(texto);
-			break;
+			if(ce.idSala == idSala) {
+                ce.chat.Add(texto);
+                break;
+            }	
 		} 		  
     }
 

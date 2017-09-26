@@ -7,8 +7,8 @@ using System.Linq;
 
 public class Command : MonoBehaviour {
 
-    private Repositorio repositorio;
-	private Servidor servidor;
+    private Repositorio repositorio = new Repositorio();
+	private Servidor servidor = new Servidor();
 
     public void falarChat(Player player, string texto)
     {
@@ -40,7 +40,7 @@ public class Command : MonoBehaviour {
         else
         if ("Mover".Contains(texto))
         { // Mover [N/S/L/O]
-			splitTexto = texto.Split(null)[1];
+			string splitTexto = texto.Split(null)[1];
 			
 			Sala salaAtual = (from item in repositorio.salas
 							  where item.idSala == player.idSala
@@ -50,7 +50,7 @@ public class Command : MonoBehaviour {
 			
 			IdSalas idSala = (from item in salaAtual.salasLigadas
 							  where item.coordenada == coordenada
-							  select item).First();
+							  select item.sala).First();
 			
 			if(idSala != null){
 				Sala salaMover = (from item in repositorio.salas
@@ -188,7 +188,7 @@ public class Command : MonoBehaviour {
 
     public bool verificaInventario(Player player, Objeto objeto)
     {
-		Objeto obj = (from item in repositorio.inventario
+		Objeto obj = (from item in repositorio.inventarios
 					  where item.idPlayer == player.idPlayer
 					  select (from objet in item.objetos
 							 where objet.tipo == objeto.tipo
@@ -247,28 +247,28 @@ public class Command : MonoBehaviour {
     }
 	
 	public Coordenadas BuscarCoordenada(string cd){
-		if("N".contais(cd))
+		if("N".Contains(cd))
 			return Coordenadas.Norte;
-		if("S".contais(cd))
+		if("S".Contains(cd))
 			return Coordenadas.Sul;
-		if("L".contais(cd))
+		if("L".Contains(cd))
 			return Coordenadas.Leste;
-		if("O".contais(cd))
+		if("O".Contains(cd))
 			return Coordenadas.Oeste;
 		
 		return Coordenadas.Default;
 	}
 	
 	public IdSalas BuscarIdSalas(string cd){
-		if("Sala1".contais(cd))
+		if("Sala1".Contains(cd))
 			return IdSalas.Sala1;
-		if("Sala2".contais(cd))
+		if("Sala2".Contains(cd))
 			return IdSalas.Sala2;
-		if("Sala3".contais(cd))
+		if("Sala3".Contains(cd))
 			return IdSalas.Sala3;
-		if("Sala4".contais(cd))
+		if("Sala4".Contains(cd))
 			return IdSalas.Sala4;
-		if("Sala5".contais(cd))
+		if("Sala5".Contains(cd))
 			return IdSalas.Sala5;
 		
 		return IdSalas.Default;
