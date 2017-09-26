@@ -136,8 +136,9 @@ public class Servidor : MonoBehaviour
     [RPC]
     void Comando(string idPlayer, string texto)
     {
-        AdicionaTexto(repositorio.BuscarPlayer(idPlayer).nome, texto);
-        string retorno = comandos.falarChat(texto);
+        Player player = repositorio.BuscarPlayer(idPlayer);
+        AdicionaTexto(player.nome, texto);
+        string retorno = comandos.falarChat(player, texto);
         notificaPlayer(idPlayer, retorno);
     }
 

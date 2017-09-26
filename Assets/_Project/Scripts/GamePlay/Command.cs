@@ -19,12 +19,6 @@ public class Command : MonoBehaviour {
 
 	}
 
-    public void GetCommand()
-    {
-        mudUI.LogText += "["+namePlayer+"]: " + falarChat(buscarPlayerById("idPlayer"), mudUI.Command.text) + "\n";
-        mudUI.Command.text = "";
-    }
-
     public string falarChat(Player player, string texto)
     {
         if ("Examinar".Contains(texto))
