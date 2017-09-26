@@ -43,11 +43,14 @@ O MUD deve suportar a lista de comandos e objetos citados abaixo.
 Feedback dos Comandos
 
 Todos os comandos devem retornar “mensagens de sucesso ou de erro” quando forem executados:
+
 	( ) As mensagens de sucesso devem ser transmitidas para todos os jogadores do recinto, além do próprio que fez a ação. Por exemplo, quando um jogador larga um objeto, o jogo deve responder com “objeto X foi largado pelo jogador Y”, ou quando alguém se move, “jogador X moveu-se para o sul”;
 	( ) Nos casos de erro, apenas o jogador que executou a ordem deve receber uma mensagem, como por exemplo, “não é possível mover-se para o norte” ou “objeto X não existe”.
 	
 Objetos
+
 	O jogo deve ter no mínimo os seguintes objetos:
+	
 	- Porta
 		( ) Item não coletável que necessita de uma chave para ser aberta;
 		( ) “Examinar porta” retorna se a mesma encontra-se aberta ou fechada;
