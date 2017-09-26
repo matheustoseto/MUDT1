@@ -95,25 +95,4 @@ public class Repositorio : MonoBehaviour
     public List<Player> players = new List<Player>();
     public List<Sala> salas = new List<Sala>();
     public List<Inventario> inventarios = new List<Inventario>();
-
-    // Use this for initialization
-    protected void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    protected void Update()
-    {
-
-    }
-
-    public Player BuscarPlayer(string idPlayer)
-    {
-        Player player = (from item in players
-                         where item.idPlayer == idPlayer
-                         select item).First();
-
-        return player;
-    }
 }

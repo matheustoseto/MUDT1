@@ -10,16 +10,6 @@ public class Command : MonoBehaviour {
     private Repositorio repositorio;
 	private Servidor servidor;
 
-	// Use this for initialization
-	void Start () {
-        repositorio = new Repositorio();
-    }
-	
-	// Update is called once per frame
-	void Update () {
-
-	}
-
     public void falarChat(Player player, string texto)
     {
         if ("Examinar".Contains(texto))
@@ -30,8 +20,10 @@ public class Command : MonoBehaviour {
                         where item.idSala == player.idSala && item.nome == splitTexto
                         select item).First();
 
-            if (sala != null)
+            if (sala != null){
                 servidor.notificaPlayer(player.idPlayer, sala.descricao);
+				return;
+			}
 
             Objeto objeto = (from item in repositorio.inventarios
                              where item.idPlayer == player.idPlayer
@@ -39,9 +31,10 @@ public class Command : MonoBehaviour {
                                      where obj.nome == splitTexto
                                      select obj).First()).First();
 
-            if (objeto != null)
+            if (objeto != null){
                 servidor.notificaPlayer(player.idPlayer, objeto.descricao);
-
+				return;
+			}
             servidor.notificaPlayer(player.idPlayer, "Sala ou Objeto não encontrado.");
         }
         else
@@ -68,8 +61,8 @@ public class Command : MonoBehaviour {
 						pl.idSala = salaMover.idSala;
 				}
 				servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
-			}
-				
+				return;
+			}				
 			servidor.notificaPlayer(player.idPlayer, "Não foi possivel mover para a sala descrita.");
         }
         else
@@ -94,8 +87,8 @@ public class Command : MonoBehaviour {
                         sala.objetos.Remove(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
+				return;
             }
-
             servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
         }
         else
@@ -121,8 +114,8 @@ public class Command : MonoBehaviour {
                         sala.objetos.Add(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto removido do inventario.");
+				return;
             }
-
             servidor.notificaPlayer(player.idPlayer, "Objeto não foi encontrado no inventario.");
         }
         else
@@ -137,6 +130,7 @@ public class Command : MonoBehaviour {
                 foreach (Objeto obj in inventario.objetos)
                     objetos += obj.nome + " - ";
                 servidor.notificaPlayer(player.idPlayer, objetos);
+				return;
             }
             servidor.notificaPlayer(player.idPlayer, "Inventario não encontrado." );
         }
@@ -240,7 +234,6 @@ public class Command : MonoBehaviour {
         return player;
     }
 	
-	
     public Player buscarPlayerByName(string nome)
     {
         Player player = (from item in repositorio.players
@@ -260,5 +253,45 @@ public class Command : MonoBehaviour {
 			return Coordenadas.Oeste;
 		
 		return Coordenadas.Default;
+	}
+	
+	public IdSalas BuscarIdSalas(string cd){
+		if("Sala1".contais(cd))
+			return IdSalas.Sala1;
+		if("Sala2".IdSalas(cd))
+			return Coordenadas.Sala2;
+		if("Sala3".IdSalas(cd))
+			return Coordenadas.Sala3;
+		if("Sala4".IdSalas(cd))
+			return Coordenadas.Sala4;
+		
+		return IdSalas.Sala5;
+	}
+	
+	public void AdicionaObjetoSala(string cdSala, string texto){
+		
+		IdSalas idSala = BuscarIdSalas(cdSala);
+		
+		if(idSala == null){
+			servidor.AdicionaTextoByIdSala(idSala, "Sala não encontrado!");
+			return;
+		}
+
+		Objeto objeto = (from item in repositorio.salas
+				 where item.idSala == idSala
+				 select (from tipo in item.objetos
+						 select (from obj in repositorio.objetos
+								 where obj.tipo == tipo && obj.nome == texto
+								 select obj).First()).First()).First();
+								 
+		if (objeto != null){
+			foreach (Sala sala in repositorio.salas)
+					if (sala.idSala == idSala)
+						sala.objetos.Add(objeto.tipo);
+					
+			servidor.AdicionaTextoByIdSala(idSala, "Objeto " + objeto.tipo + "adicionado!");
+			return;
+		}	
+		servidor.AdicionaTextoByIdSala(idSala, "Objeto não encontrado!");				
 	}
 }

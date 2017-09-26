@@ -2,6 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
+public ChatEntries {
+	public IdSalas idSala;
+	public List<string> chat = new List<string>();
+}
+
 public class Servidor : MonoBehaviour
 {
 
@@ -10,13 +16,21 @@ public class Servidor : MonoBehaviour
     private NetworkView netWorkView;
     private Repositorio repositorio = new Repositorio();
     private Command comandos = new Command();
-
-    private List<string> chatEntries = new List<string>();
+	public string objetoTextChat = "Digite o tipo do objeto.";
+	public string idSalaTextChat = "Digite o id da sala";
+    private List<ChatEntries> chatEntries = new List<ChatEntries>();
 
     // Use this for initialization
     void Start()
     {
         netWorkView = GetComponent<NetworkView>();
+		
+		foreach(Sala sala in repositorio.salas){
+			ChatEntries chat = new ChatEntries();
+			chat.idSala = sala.idSala;
+			
+			chatEntries.Add(chat);
+		}
     }
 
     // Update is called once per frame
@@ -46,24 +60,32 @@ public class Servidor : MonoBehaviour
         {
             if (Network.peerType == NetworkPeerType.Connecting)
             {
-
                 GUILayout.Label("Conectando...");
-
             }
             else if (Network.peerType == NetworkPeerType.Server)
             {
-
                 GUILayout.Label("Servidor inicializado com sucesso!");
                 GUILayout.Label("Conexões: " + Network.connections.Length);
             }
 
             if (GUILayout.Button("Desconectar"))
-            {
-                Network.Disconnect(200);
-            }
-
-            foreach (string tx in chatEntries)
-                GUILayout.Label(tx);
+				Network.Disconnect(200);
+			
+			
+			objetoTextChat = GUILayout.TextField(objetoTextChat, GUILayout.MinWidth(100));
+			idSalaTextChat = GUILayout.TextField(idSalaTextChat, GUILayout.MinWidth(100));
+			if(GUI.Button(new Rect(200, 50, 120, 50), "Adicionar Item")){
+				comandos.AdicionaObjetoSala(idSalaTextChat, objetoTextChat);
+				objetoTextChat = "";
+				idSalaTextChat = "";
+			}
+            foreach (ChatEntries chat in chatEntries){
+				GUILayout.Label(chat.idSala);
+				foreach(string txt in chat.chat)
+					GUILayout.Label(tx);
+				GUILayout.Space(3);
+			}
+                
         }
     }
 
@@ -129,7 +151,7 @@ public class Servidor : MonoBehaviour
         string txt = "Jogador " + name + " se connectou!";
 
         NotificaTodosPlayers("", txt);
-        AdicionaTexto("", txt);
+        AdicionaTextoByIdSala(IdSalas.Sala1, txt);
         
         info.networkView.RPC("SetIdPlayer", RPCMode.All, name, player.idPlayer);
     }
@@ -137,8 +159,8 @@ public class Servidor : MonoBehaviour
     [RPC]
     void Comando(string idPlayer, string texto)
     {
-        Player player = repositorio.BuscarPlayer(idPlayer);
-        AdicionaTexto(player.nome, texto);
+        Player player = comandos.buscarPlayerById(idPlayer);
+        AdicionaTexto(player, texto);
         comandos.falarChat(player, texto);
     }
 
@@ -152,12 +174,22 @@ public class Servidor : MonoBehaviour
         netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto);
     }
 
-    void AdicionaTexto(string nomePlayer, string texto)
+    void AdicionaTexto(Player player, string texto)
     {
-        if(nomePlayer != "")
-            chatEntries.Add("[" + nomePlayer + "]" + texto);
-        else
-            chatEntries.Add(texto);
+		foreach(ChatEntries ce in chatEntries){
+			if(ce.idSala == player.idSala)
+				ce.chat.Add("[" + player.nome + "]" + texto);
+			break;
+		} 	  
+    }
+	
+	void AdicionaTextoByIdSala(IdSalas idSala, string texto)
+    {
+		foreach(ChatEntries ce in chatEntries){
+			if(ce.idSala == idSala)
+				ce.chat.Add(texto);
+			break;
+		} 		  
     }
 
     //Client function
