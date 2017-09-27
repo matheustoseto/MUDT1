@@ -29,7 +29,7 @@ public class Command : MonoBehaviour {
                          select item).FirstOrDefault();
 
             if (sala != null) {
-                servidor.notificaPlayer(player.idPlayer, sala.descricao);
+                servidor.notificaPlayer(player.idPlayer, GerarDescricaoSala(sala.descricao, player));
                 return;
             }
 
@@ -92,6 +92,7 @@ public class Command : MonoBehaviour {
                         pl.idSala = salaMover.idSala;
                 }
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
+				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "moveu-se para a sala " + salaMover.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Não foi possivel mover para a sala descrita.");
@@ -109,6 +110,12 @@ public class Command : MonoBehaviour {
                                              select obj).FirstOrDefault()).FirstOrDefault()).FirstOrDefault();
             if (objeto != null)
             {
+				
+				if(!objeto.pegar){
+					servidor.notificaPlayer(player.idPlayer, "Esse objeto não é permitido coletar.");
+					return;
+				}					
+				
                 foreach (Inventario inventario in repositorio.inventarios)
                     if (inventario.idPlayer == player.idPlayer)
                         inventario.objetos.Add(objeto);
@@ -118,6 +125,7 @@ public class Command : MonoBehaviour {
                         sala.objetos.Remove(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
+				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "pegou o objeto" + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
@@ -281,6 +289,14 @@ public class Command : MonoBehaviour {
         return player;
     }
 	
+	public Sala BuscarSalaByIdSala(IdSalas idSala){
+		Sala sala = (from item in repositorio.salas
+					 where item.idSala == idSala
+					 select item).FirstOrDefault();
+		
+		return sala;
+	}
+	
 	public Coordenadas BuscarCoordenada(string cd){
 		if("N".Contains(cd))
 			return Coordenadas.Norte;
@@ -334,5 +350,42 @@ public class Command : MonoBehaviour {
 			return;
 		}	
 		servidor.AdicionaTextoByIdSala(idSala, "Objeto não encontrado!");				
+	}
+	
+	public string GerarDescricaoSala(string texto, Player player){
+		
+		string descricao = texto;
+		
+		List<Player> jogadores = (from item in repositorio.players
+						  where item.idSala = player.idSala
+						  select item).List();
+		
+		string qntJogadores = jogadores.Count;
+		
+		List<TipoObjeto> tipoObjetos = (from item in repositorio.salas
+										where item.idSala == player.idSala
+										select item.objetos).List();
+									
+		List<Objeto> objs = (from item in repositorio.objetos
+							 where item.tipo == tipoObjeto
+							 select item).List();
+							 
+		string objtsTexto = "";
+		foreach(Objeto obj in objs)
+			objtsTexto.concat(obj.nome).concat(" - ");
+			
+		string salasAdj = "";
+		List<SalasLigadas> salasLigadas = (from item in repositorio.salas
+											where item.idSala == player.idSala
+											select item.salasLigadas).List();
+		
+		foreach(SalasLigadas sl in salasLigadas)
+			salasAdj.concat("A/Ao ").concat(sl.coordenada).concat(" possui uma porta para a sala ").concat(BuscarSalaByIdSala(sl.sala).nome).concat(". ");									
+		
+		descricao = descricao.Repleace("XJ",qntJogadores);
+		descricao = descricao.Repleace("XOBJ",objtsTexto);
+		descricao = descricao.Repleace("XCS",salasAdj);
+		
+		return descricao;
 	}
 }

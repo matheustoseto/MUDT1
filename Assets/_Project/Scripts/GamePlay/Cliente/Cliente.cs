@@ -9,6 +9,7 @@ public class Cliente : MonoBehaviour
     public int connectPort = 25001;
     public string playerName;
     private string idPlayer;
+	private string idSala;
     private NetworkView netWorkView;
     public string textChat;
     private List<string> chatEntries = new List<string>();
@@ -60,6 +61,7 @@ public class Cliente : MonoBehaviour
             {
                 GUILayout.Label("Cliente Connectado com sucesso!");
                 GUILayout.Label("idPlayer: " + idPlayer);
+				GUILayout.Label("idSala: " + idSala);
                 GUILayout.Label("Ping: " + Network.GetAveragePing(Network.connections[0]));
 
                 if (GUILayout.Button("Desconectar")) {
@@ -95,20 +97,22 @@ public class Cliente : MonoBehaviour
     }
 
     [RPC]
-    void SetIdPlayer(string playerName, string idPlayer)
+    void SetPlayerPref(string playerName, string idPlayer, string idSala)
     {
-        if(this.playerName == playerName)
-            this.idPlayer = idPlayer;
+        if(this.playerName == playerName){
+			this.idPlayer = idPlayer;
+			this.idSala = idSala;
+		}        
     }
 
     [RPC]
     void ShowText(string nomePlayer, string texto)
     {
-        if(nomePlayer != "" && nomePlayer != null)
-            chatEntries.Add("[" + nomePlayer + "] " + texto);
-        else
-            chatEntries.Add(texto);
-
+        if(nomePlayer != "" && nomePlayer != null){
+			chatEntries.Add("[" + nomePlayer + "] " + texto);
+		} else {
+			chatEntries.Add(texto);
+		}
         textChat = "";
     }
 
@@ -116,6 +120,13 @@ public class Cliente : MonoBehaviour
     void Sendmsg(string idPlayer, string texto)
     {
         if (this.idPlayer == idPlayer)
+            ShowText("", texto);
+    }
+	
+	[RPC]
+    void NotificaOutros(string idSala, string texto)
+    {
+        if (this.idSala == idSala)
             ShowText("", texto);
     }
 

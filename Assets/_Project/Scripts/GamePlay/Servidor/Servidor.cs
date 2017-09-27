@@ -182,7 +182,8 @@ public class Servidor : MonoBehaviour
         NotificaTodosPlayers("", txt);
         AdicionaTextoByIdSala(IdSalas.Sala1, txt);
         
-        info.networkView.RPC("SetIdPlayer", RPCMode.All, name, player.idPlayer);
+        info.networkView.RPC("SetPlayerPref", RPCMode.All, name, player.idPlayer, player.idSala.toString());
+		comandos.falarChat(player, "Examinar " + comandos.BuscarSalaByIdSala(player.idSala).nome);
     }
 
     [RPC]
@@ -197,6 +198,11 @@ public class Servidor : MonoBehaviour
     public void NotificaTodosPlayers(string nomePlayer, string texto)
     {
         netWorkView.RPC("ShowText", RPCMode.All, nomePlayer, texto);
+    }
+	
+	public void NotificaOutrosPlayersBySala(Player player, string texto)
+    {
+        netWorkView.RPC("NotificaOutros", RPCMode.Others, player.idSala, texto);
     }
 
     public void notificaPlayer(string idPlayer, string texto)
@@ -230,9 +236,11 @@ public class Servidor : MonoBehaviour
     //Client function
     //As funções do cliente devem ser declaradas no servidor porém vazias
     [RPC]
-    void SetIdPlayer(string playerName, string idPlayer) {}
+    void SetPlayerPref(string playerName, string idPlayer, string idSala) {}
     [RPC]
     void ShowText(string nomePlayer, string texto) {}
     [RPC]
     void Sendmsg(string idPlayer, string texto) {}
+	[RPC]
+    void NotificaOutros(string idSala, string texto) {}
 }
