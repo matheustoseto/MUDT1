@@ -1,0 +1,253 @@
+
+
+class Item
+
+	String name
+	String type
+	float weight
+	String description
+
+	
+class Inventory
+	int idPlayer
+	List item
+
+	
+class Player
+	int id
+	String name
+	int roomId
+	
+class Room
+	int id
+	String name
+	List item
+	String description
+	
+	
+	
+class GamePlay		
+	LIST inventory
+	LIST rom
+	LIST player
+	LIST itens
+	
+
+class CommandType
+	Enum Comandos{Examinar,Mover,Pegar,Largar,Inventorio,Usar}	
+	
+Class TypeItem
+	Enum itemTypos{}
+	
+
+	
+
+Ao entar na sala, o jogo cria uma classe Player, define seu nome, 
+insere um id da sala e insere o player na lista de players
+
+
+Lógica do player:
+
+Ao usar o comando
+- Examinar [nome da sala]
+		Busca inventario no hashmap
+			Verificar se possui o item mapa
+				Se Possuir mostra a descrição da sala e salas adjacentes
+				Se não mostra que não possui o mapa
+				
+- Examinar [nome do objeto]
+		Busca lista de itens
+			
+				
+				
+				
+				
+				
+Sala 1 ( Taverna )
+
+Examinar: Você está em um quarto fechado, com X jogadores neste momento. Nesta sala contém um Machado, 
+uma carta e duas moedas. A leste possui uma porta para a sala 2.
+
+DePara: Você está em um quarto fechado, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+
+
+Sala 2 ( Vila )
+
+Examinar: Você está em uma vila aberta, com X jogadores neste momento e um NPC chamado X. Nesta sala contém uma Vara de Pescar, 5 moedas, uma Tocha e uma bota. 
+A Oeste possui uma porta para a sala 1. A Leste possui uma porta para a sala 3. Ao Sul possui uma porta para a sala 4.
+
+DePara: Você está em uma vila aberta, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+
+Sala 3 ( Floresta )
+
+Examinar: Você está em uma floresta aberta, com X jogadores neste momento. Nesta sala contém Árvores. 
+A Oeste possui uma porta para a sala 2. A Leste possui uma porta para a sala 5.
+
+DePara: Você está em uma floresta aberta, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+
+Sala 4 ( Lago )
+
+Examinar: Você está em um lago, com X jogadores neste momento. Nesta sala contém árvores, um lago e uma ponte para pesca. 
+Ao norte possui uma porta para a sala 2.
+
+DePara: Você está em um lago, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+
+Sala 5 ( Caverna )
+
+Examinar: Você está em uma caverna, com X jogadores neste momento. Nesta sala contém rochas, uma espada e um mapa.
+A Oeste possui uma porta para a sala 3.
+
+DePara: Você está em uma caverna, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+
+
+Objetos:
+
+- Machado
+Examinar: Um machado de madeira e metal velho, usado por um lenhador local.
+
+- Carta
+Examinar: Seja bem vindo a essa aventura.
+
+- Moedas
+Examinar: Pedaços de ouro usado como moeda de troca.
+
+- Vara de Pescar
+Examinar: Uma vara de madeira com isca.
+
+- Tocha
+Examinar: Uma tocha de madeira e carvão.
+
+- Bota
+Examinar: Uma bota de couro de uso geral.
+
+- Espada
+Examinar: Uma espada com uma lâmina afiada com um cabo de madeira.
+
+- Mapa
+Examinar: Um mapa que mostra o mundo onde você se encontra.
+
+- Lenha
+Examinar: Uma lenha de boa qualidade.
+
+- Peixe
+Examinar: Um peixe fresco.
+
+- Peixe Assado
+Examinar: Um peixe no ponto.
+
+Não Objetos:
+
+- Árvores
+Examinar: Uma árvore verde de porte médio.
+
+- Rocha
+Examinar: Um amontoado de rocha.
+
+- Lago
+Examinar: Um lago com uma ponte de pesca e folhas.
+
+- Ponte para pesca
+Examinar: Uma ponte para ser usada para pescar.
+
+- Fogueira
+Examinar: Uma fogueira acessa.
+
+
+Combinações:
+
+Usar Machado = Você Equipou/Você Retirou.
+Usar Machado > Árvore = Você Obteu Uma Lenha.
+Usar Tocha = Sua Tocha está acessa/Sua tocha está apagada.
+Usar Bota = Você Equipou/Você Retirou.
+Usar Vara de Pescar = Você Equipou/Você Retirou.
+Usar Vara de Pescar > Ponte para Pesca = Você obteve um peixe.
+Usar Espada = Você Equipou/Você Retirou.
+Usar Mapa = Exibir/Fechar.
+Usar Lenha > Tocha Acessa = Você fez uma fogueira.
+Usar Peixe > Fogueira = Você Obteve um peixe assado.
+Usar Peixe Assado > Jogador = Você comeu um peixe.
+
+
+Outras Combinações:
+Usar * > * = Não Aconteceu Nada.
+
+
+Pegar Objeto = Você obteve o objeto X.
+Inventario = No momento você tem X objetos. x,x,x,x,x,x,x.
+Largar Objeto = Você largou o objeto X.
+
+
+============================================================================================================================
+============================================================================================================================
+============================================================================================================================
+
+public enum TipoObjeto {
+	Machado,
+	Carta,
+	Moeda,
+	Vara de Pescar,
+	Tocha,
+	Bota,
+	Espada,
+	Mapa,
+	Lenha,
+	Peixe,
+	Peixe Assado,
+	Arvores,
+	Rocha,
+	Lago,
+	Ponte para Pesca,
+	Fogueira
+}
+
+//------ OBJETOS DO JOGO --------
+public class Objetos {
+	public string Nome;
+	public TipoObjeto Tipo;
+	public boolean Pegar;
+	public string Descricao;
+}
+//------------------------------
+
+//------ PLAYER ----------------
+public class Player {
+	private int idPlayer;
+	public string Nome;
+}
+//------------------------------
+
+//------ SALA ------------------
+public class Sala {
+	public string Nome;
+	public string Descricao;
+	public List<TipoObjeto> objetos;
+}
+//------------------------------
+
+public class Repositorio : MonoBehaviour {
+
+    public List<Objetos> objetos;
+	public List<Player> player;
+	public List<Sala> salas;
+	
+	public HashMap<Sala, List<Player>> salaComPlayers;
+     
+    // Use this for initialization
+    protected void Start () {
+	
+	}
+
+    // Update is called once per frame
+    protected void Update () {
+	
+	}
+}
+
+
+============================================================================================================================
+============================================================================================================================
+============================================================================================================================
+
+
+
+
