@@ -13,31 +13,39 @@ public class Servidor : MonoBehaviour
 
     public string connectToIP = "127.0.0.1";
     public int connectPort = 25001;
-    private NetworkView netWorkView;
-    private Repositorio repositorio = new Repositorio();
-    private Command comandos = new Command();
+    public NetworkView netWorkView;
 	public string objetoTextChat = "Digite o tipo do objeto.";
 	public string idSalaTextChat = "Digite o id da sala";
     private List<ChatEntries> chatEntries = new List<ChatEntries>();
 	private IdSalas idSalaAtual = IdSalas.Sala1;
 
+    private Repositorio repositorio;
+    private Command comandos;
+
     // Use this for initialization
     void Start()
     {
-        netWorkView = GetComponent<NetworkView>();
-		
-		foreach(Sala sala in repositorio.salas){
-			ChatEntries chat = new ChatEntries();
-			chat.idSala = sala.idSala;
-			
-			chatEntries.Add(chat);
-		}
+        netWorkView = GetComponent<NetworkView>();    
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    void Awake()
+    {
+        repositorio = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Repositorio>();
+        comandos = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Command>();
+
+        foreach (Sala sala in repositorio.salas)
+        {
+            ChatEntries chat = new ChatEntries();
+            chat.idSala = sala.idSala;
+
+            chatEntries.Add(chat);
+        }
     }
 
     public void OnGUI()
@@ -71,9 +79,8 @@ public class Servidor : MonoBehaviour
 
             if (GUILayout.Button("Desconectar"))
 				Network.Disconnect(200);
-			
-			
-			objetoTextChat = GUILayout.TextField(objetoTextChat, GUILayout.MinWidth(100));
+
+            objetoTextChat = GUILayout.TextField(objetoTextChat, GUILayout.MinWidth(100));
 			idSalaTextChat = GUILayout.TextField(idSalaTextChat, GUILayout.MinWidth(100));
 			if(GUI.Button(new Rect(200, 50, 120, 50), "Adicionar Item")){
 				comandos.AdicionaObjetoSala(idSalaTextChat, objetoTextChat);
@@ -97,12 +104,13 @@ public class Servidor : MonoBehaviour
 				idSalaAtual = IdSalas.Sala5;
 			
             foreach (ChatEntries chat in chatEntries){
-				GUILayout.Label(chat.idSala.ToString());
 				if(chat.idSala == idSalaAtual)
-					foreach(string txt in chat.chat)
-						GUILayout.Label(txt);
-			}
-                
+                {
+                    GUILayout.Label(chat.idSala.ToString());
+                    foreach (string txt in chat.chat)
+                        GUILayout.Label(txt);
+                }		
+			}       
         }
     }
 
@@ -163,6 +171,10 @@ public class Servidor : MonoBehaviour
         player.networkPlayer = info.sender;
 		player.idSala = IdSalas.Sala1;
 
+        Inventario inventario = new Inventario();
+        inventario.idPlayer = player.idPlayer;
+
+        repositorio.inventarios.Add(inventario);
         repositorio.players.Add(player);
 
         string txt = "Jogador " + name + " se connectou!";
@@ -189,6 +201,8 @@ public class Servidor : MonoBehaviour
 
     public void notificaPlayer(string idPlayer, string texto)
     {
+        Debug.Log(idPlayer);
+        Debug.Log(texto);
         netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto);
     }
 

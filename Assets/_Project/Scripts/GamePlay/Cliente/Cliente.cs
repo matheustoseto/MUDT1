@@ -67,6 +67,9 @@ public class Cliente : MonoBehaviour
                     Network.Disconnect(200);       
                 }
 
+                if (GUILayout.Button("Clear"))
+                    chatEntries.Clear();
+
                 textChat = GUILayout.TextField(textChat, GUILayout.MinWidth(100));
 
                 foreach (string tx in chatEntries)
@@ -80,7 +83,7 @@ public class Cliente : MonoBehaviour
 
     void DigitarTexto(string texto)
     {
-        //netWorkView.RPC("ShowText", RPCMode.All, playerName, texto);
+        ShowText(playerName, texto);
         netWorkView.RPC("Comando", RPCMode.Server, idPlayer, texto);
     }
 

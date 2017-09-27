@@ -5,6 +5,7 @@ using System.Linq;
 
 public enum TipoObjeto
 {
+    Default,
     Machado,
     Carta,
     Moeda,
@@ -25,21 +26,21 @@ public enum TipoObjeto
 
 public enum IdSalas
 {
+    Default,
     Sala1,
     Sala2,
     Sala3,
     Sala4,
-    Sala5,
-	Default
+    Sala5
 }
 
 public enum Coordenadas
 {
+    Default,
     Norte,
     Sul,
     Leste,
-    Oeste,
-	Default
+    Oeste
 }
 
 [System.Serializable]
