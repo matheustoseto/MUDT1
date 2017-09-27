@@ -92,7 +92,7 @@ public class Command : MonoBehaviour {
                         pl.idSala = salaMover.idSala;
                 }
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "moveu-se para a sala " + salaMover.nome);
+				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Não foi possivel mover para a sala descrita.");
@@ -125,7 +125,7 @@ public class Command : MonoBehaviour {
                         sala.objetos.Remove(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "pegou o objeto" + objeto.nome);
+				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " pegou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
@@ -153,6 +153,7 @@ public class Command : MonoBehaviour {
                         sala.objetos.Add(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto removido do inventario.");
+				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "largou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não foi encontrado no inventario.");
@@ -180,16 +181,20 @@ public class Command : MonoBehaviour {
             Objeto objeto = buscarObjeto(splitTexto[1]);
             Objeto alvo = buscarObjeto(splitTexto[2]);
 
-            if (!verificaInventario(player, objeto))
-                servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
-
-            if (alvo != null && !verificaInventario(player, alvo))
-                servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
-
-            if (objeto != null && alvo != null)
-                servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
-            else if (objeto != null)
-                servidor.notificaPlayer(player.idPlayer, usarObjeto(objeto.tipo));
+			if (objeto != null && alvo != null){
+	
+				//Implementar objeto porta
+				//Só pode usar objeto => alvo em porta, o resto retorna que não é possivel
+				//Verificar se objeto porta esta na mesma sala
+	
+				servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
+			} else if (objeto != null){
+				if (!verificaInventario(player, objeto)){
+					servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
+					return;
+				}
+				servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto));
+			}    
         }
         else
         if (texto.Contains("Falar"))
@@ -240,29 +245,25 @@ public class Command : MonoBehaviour {
         return (obj != null);
     }
 
-    public string usarObjeto(TipoObjeto objeto)
+    public string usarObjeto(Player player, TipoObjeto objeto)
     {
-        switch (objeto)
-        {
-            case TipoObjeto.Machado:
-                {
-
-                    break;
-                }
-        }         
-        return null;
+        foreach (Inventario inventario in repositorio.inventarios)
+			if (inventario.idPlayer == player.idPlayer){
+				foreach(Objeto obj in inventario.objetos)
+					if(obj.tipo == objeto.tipo){
+						if(obj.usar){
+							obj.usar = false;
+							obj.descricaoUsarN;
+						} else {
+							obj.usar = true;
+							obj.descricaoUsarS;
+						}
+					}					
+			}
     }
 
     public string usarObjetoAlvo(TipoObjeto objeto, TipoObjeto alvo)
     {
-        switch (objeto)
-        {
-            case TipoObjeto.Machado:
-                {
-
-                    break;
-                }
-        }
         return null;
     }
 

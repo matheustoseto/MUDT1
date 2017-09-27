@@ -59,6 +59,8 @@ public class Objeto
     public bool pegar;
     public bool usar;
     public string descricao;
+	public string descricaoUsarS;
+	public string descricaoUsarN;
 }
 //------------------------------
 
