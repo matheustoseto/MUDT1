@@ -103,12 +103,16 @@ public class Command : MonoBehaviour {
         { // Pegar [objeto]
             string splitTexto = texto.Split(null)[1];
 
-            Objeto objeto = (from item in repositorio.salas
-                             where item.idSala == player.idSala
-                             select (from tipo in item.objetos
-                                     select (from obj in repositorio.objetos
-                                             where obj.tipo == tipo && obj.nome == splitTexto
-                                             select obj).FirstOrDefault()).FirstOrDefault()).FirstOrDefault();
+            List<TipoObjeto> objetos = (from item in repositorio.salas
+                                        where item.idSala == player.idSala
+                                        select item.objetos).FirstOrDefault();
+
+            Objeto objeto = (from obj in repositorio.objetos
+                            where objetos.Contains(obj.tipo) && obj.nome == splitTexto
+                            select obj).FirstOrDefault();
+
+            Debug.Log("objeto: "+ objeto);
+
             if (objeto != null)
             {
 				
@@ -136,18 +140,21 @@ public class Command : MonoBehaviour {
         { // Largar [objeto]
             string splitTexto = texto.Split(null)[1];
 
-            Objeto objeto = (from item in repositorio.inventarios
-                             where item.idPlayer == player.idPlayer
-                             select (from obj in item.objetos
-                                     where obj.nome == splitTexto
-                                     select obj).FirstOrDefault()).FirstOrDefault();
+            Objeto objeto = (from obj in repositorio.objetos
+                             where obj.nome == splitTexto
+                             select obj).FirstOrDefault();
+
+            Debug.Log("objeto: " + objeto);
+
             if (objeto != null)
             {
-                foreach (Inventario inv in repositorio.inventarios)
-                    if (inv.idPlayer == player.idPlayer)
-                        foreach (Objeto obj in inv.objetos)
-                            if (obj.nome == splitTexto)
-                                inv.objetos.Remove(obj);
+                Inventario inv = (from item in repositorio.inventarios
+                                  where item.idPlayer == player.idPlayer
+                                  select item).FirstOrDefault();
+
+                foreach (Objeto obj in inv.objetos)
+                    if (obj.nome == splitTexto)
+                        inv.objetos.Remove(obj);
 
                 foreach (Sala sala in repositorio.salas)
                     if (sala.idSala == player.idSala)

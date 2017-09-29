@@ -87,7 +87,8 @@ public class Sala
 }
 //------------------------------
 
- public class Inventario
+[System.Serializable]
+public class Inventario
 {
     public string idPlayer;
     public List<Objeto> objetos = new List<Objeto>();
