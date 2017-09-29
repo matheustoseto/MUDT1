@@ -5,7 +5,7 @@ public class ConnectMUD : MonoBehaviour
 {
 
     [SerializeField]
-    private ConnectionMudUI connectMudUI;
+    private MUDServidorUI connectMudUI;
 
     [SerializeField] private ChatMudUI chatMudUI;
 
@@ -19,7 +19,7 @@ public class ConnectMUD : MonoBehaviour
     {
         connectMudUI.Address = connectToIP;
         connectMudUI.Port = connectPort;
-        connectMudUI.Message = "Connection status: Disconnected";
+        connectMudUI.ConnectMessage = "Connection status: Disconnected";
     }
 
     // Update is called once per frame
@@ -44,7 +44,7 @@ public class ConnectMUD : MonoBehaviour
         {
             if (Network.peerType == NetworkPeerType.Connecting)
             {
-                connectMudUI.Message = "Connection status: Connecting";
+                connectMudUI.ConnectMessage = "Connection status: Connecting";
                 chatMudUI.LogText += "Connection status: Connecting\n";
             }
 
@@ -52,15 +52,15 @@ public class ConnectMUD : MonoBehaviour
             {
 
                 //We've got a connection(s)!
-                connectMudUI.Message = "Connection status: Server!";
-                connectMudUI.Message = "Connections: " + Network.connections.Length;
+                connectMudUI.ConnectMessage = "Connection status: Server!";
+                connectMudUI.ConnectMessage = "Connections: " + Network.connections.Length;
 
                 chatMudUI.LogText += "Connection status: Server!\n";
                 chatMudUI.LogText += "Connections: " + Network.connections.Length+"\n";
 
                 if (Network.connections.Length >= 1)
                 {
-                    connectMudUI.Message = "Ping to first player: " + Network.GetAveragePing(Network.connections[0]) + "\n";
+                    connectMudUI.ConnectMessage = "Ping to first player: " + Network.GetAveragePing(Network.connections[0]) + "\n";
                     chatMudUI.LogText += "Ping to first player: " + Network.GetAveragePing(Network.connections[0]) + "\n";
                 }
 

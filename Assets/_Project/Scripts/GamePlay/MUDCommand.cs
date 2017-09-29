@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Command : MonoBehaviour {
+public class MUDCommand : MonoBehaviour {
 
-    private Servidor servidor;
+    private MUDServidor servidor;
     private Repositorio repositorio;
 
     void Awake()
     {
-        servidor = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Servidor>();
+        servidor = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<MUDServidor>();
         repositorio = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Repositorio>();
     }
 

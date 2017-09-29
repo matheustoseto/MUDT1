@@ -20,7 +20,7 @@ public class Servidor : MonoBehaviour
 	private IdSalas idSalaAtual = IdSalas.Sala1;
 
     private Repositorio repositorio;
-    private Command comandos;
+    private Command_old comandos;
 
     // Use this for initialization
     void Start()
@@ -37,7 +37,7 @@ public class Servidor : MonoBehaviour
     void Awake()
     {
         repositorio = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Repositorio>();
-        comandos = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Command>();
+        comandos = GameObject.FindGameObjectWithTag("Repositorio").GetComponent<Command_old>();
 
         foreach (Sala sala in repositorio.salas)
         {
