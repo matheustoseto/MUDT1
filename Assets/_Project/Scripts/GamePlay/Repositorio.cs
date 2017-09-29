@@ -58,6 +58,7 @@ public class Objeto
     public TipoObjeto tipo;
     public bool pegar;
     public bool usar;
+    public bool usou;
     public string descricao;
 	public string descricaoUsarS;
 	public string descricaoUsarN;

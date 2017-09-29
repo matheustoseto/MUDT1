@@ -91,8 +91,11 @@ public class Command : MonoBehaviour {
                     if (pl.idPlayer == player.idPlayer)
                         pl.idSala = salaMover.idSala;
                 }
+
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, salaAtual.nome, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+                servidor.SetPref(player);
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+   
                 falarChat(player, "Examinar " + salaMover.nome);
                 return;
             }
@@ -126,11 +129,13 @@ public class Command : MonoBehaviour {
                         inventario.objetos.Add(objeto);
 
                 foreach (Sala sala in repositorio.salas)
-                    if (sala.idSala == player.idSala)
+                    if (sala.idSala == player.idSala) { 
                         sala.objetos.Remove(objeto.tipo);
+                        break;
+                    }
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " pegou o objeto " + objeto.nome);
+				servidor.NotificaOutrosPlayersBySala(player.idPlayer, BuscarSalaByIdSala(player.idSala).nome, "Jogador " + player.nome + " pegou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
@@ -144,24 +149,26 @@ public class Command : MonoBehaviour {
                              where obj.nome == splitTexto
                              select obj).FirstOrDefault();
 
-            Debug.Log("objeto: " + objeto);
+            Inventario inv = (from item in repositorio.inventarios
+                              where item.idPlayer == player.idPlayer && item.objetos.Contains(objeto)
+                              select item).FirstOrDefault();
 
-            if (objeto != null)
+            if (objeto != null && inv != null)
             {
-                Inventario inv = (from item in repositorio.inventarios
-                                  where item.idPlayer == player.idPlayer
-                                  select item).FirstOrDefault();
-
                 foreach (Objeto obj in inv.objetos)
-                    if (obj.nome == splitTexto)
+                    if (obj.nome == splitTexto) { 
                         inv.objetos.Remove(obj);
+                        break;
+                    }
+
+                Debug.Log("Removeu do inventario!!!");
 
                 foreach (Sala sala in repositorio.salas)
                     if (sala.idSala == player.idSala)
                         sala.objetos.Add(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto removido do inventario.");
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "largou o objeto " + objeto.nome);
+				servidor.NotificaOutrosPlayersBySala(player.idPlayer, BuscarSalaByIdSala(player.idSala).nome, "Jogador " + player.nome + " largou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não foi encontrado no inventario.");
@@ -185,9 +192,13 @@ public class Command : MonoBehaviour {
         else
         if (texto.Contains("Usar"))
         { // Usar [objeto] {alvo}
-            string[] splitTexto = texto.Split(null);
-            Objeto objeto = buscarObjeto(splitTexto[1]);
-            Objeto alvo = buscarObjeto(splitTexto[2]);
+            string[] splitTexto = texto.Replace("Usar ", "").Split(null);
+
+            Objeto objeto = buscarObjeto(splitTexto[0]);
+            Objeto alvo = null;
+
+            if (splitTexto.Length > 1)
+                alvo = buscarObjeto(splitTexto[1]);
 
 			if (objeto != null && alvo != null){
 	
@@ -207,13 +218,19 @@ public class Command : MonoBehaviour {
         else
         if (texto.Contains("Falar"))
         { // Falar [texto]
-            servidor.NotificaTodosPlayers(player.nome, texto.Replace("Falar ",""));
+            servidor.NotificaTodosPlayers(player.idPlayer, texto.Replace("Falar ",""), BuscarSalaByIdSala(player.idSala).nome);
         }
         else
         if (texto.Contains("Cochichar"))
         { // Cochichar [texto] [jogador]
-			string splitTexto = texto.Split(null)[1];
-			string jogador = texto.Split(null)[2];
+            string[] fala = texto.Replace("Cochichar ", "").Split(null);
+            string jogador = fala[fala.Length - 1].Replace(" ","");
+
+            string splitTexto = "";
+            foreach (string f in fala)
+                splitTexto = splitTexto + f + " ";
+
+            splitTexto = splitTexto.Replace(jogador, "");
 
             Debug.Log(splitTexto);
             Debug.Log(jogador);
@@ -258,17 +275,17 @@ public class Command : MonoBehaviour {
         foreach (Inventario inventario in repositorio.inventarios)
 			if (inventario.idPlayer == player.idPlayer){
 				foreach(Objeto obj in inventario.objetos)
-					if(obj.tipo == objeto){
-						if(obj.usar){
-							obj.usar = false;
+					if(obj.tipo == objeto && obj.usar){
+						if(obj.usou){
+							obj.usou = false;
 							return obj.descricaoUsarN;
 						} else {
-							obj.usar = true;
+							obj.usou = true;
 							return obj.descricaoUsarS;
 						}
 					}					
 			}
-        return "";
+        return "Você não pode usar esse objeto.";
     }
 
     public string usarObjetoAlvo(TipoObjeto objeto, TipoObjeto alvo)
@@ -306,6 +323,13 @@ public class Command : MonoBehaviour {
 		
 		return sala;
 	}
+
+    public Player BuscarPlayerByNetwork(NetworkPlayer network)
+    {
+        return (from item in repositorio.players
+                where item.networkPlayer == network
+                select item).FirstOrDefault();
+    }
 	
 	public Coordenadas BuscarCoordenada(string cd){
 		if("N".Contains(cd))
@@ -356,7 +380,7 @@ public class Command : MonoBehaviour {
 					if (sala.idSala == idSala)
 						sala.objetos.Add(objeto.tipo);
 					
-			servidor.AdicionaTextoByIdSala(idSala, "Objeto " + objeto.tipo + "adicionado!");
+			servidor.AdicionaTextoByIdSala(idSala, "Objeto " + objeto.tipo + " adicionado!");
 			return;
 		}	
 		servidor.AdicionaTextoByIdSala(idSala, "Objeto não encontrado!");				
@@ -390,7 +414,7 @@ public class Command : MonoBehaviour {
 											select item.salasLigadas).FirstOrDefault();
 		
 		foreach(SalasLigadas sl in salasLigadas)
-            salasAdj= salasAdj + "A/Ao " + sl.coordenada + " possui uma porta para a sala " + BuscarSalaByIdSala(sl.sala).nome + ". ";									
+            salasAdj= salasAdj + sl.coordenada + " possui uma porta para a sala " + BuscarSalaByIdSala(sl.sala).nome + ". ";									
 		
 		descricao = descricao.Replace("XJ",qntJogadores);
 		descricao = descricao.Replace("XOBJ",objtsTexto);

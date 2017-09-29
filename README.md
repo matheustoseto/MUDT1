@@ -19,13 +19,13 @@ O MUD deve suportar a lista de comandos e objetos citados abaixo.
 
 	- Examinar [sala/objeto]
 		(X) Retorna a descrição da sala atual (sala) ou objeto mencionado;
-		( ) A descrição da sala também deve listar as salas adjacentes e suas respectivas direções, objetos e demais jogadores presentes no local.
+		(X) A descrição da sala também deve listar as salas adjacentes e suas respectivas direções, objetos e demais jogadores presentes no local.
 	- Mover [N/S/L/O]
  		(X) O jogador deve mover-se para a direção indicada (norte, sul, leste ou oeste);
-		( ) Ao entrar numa nova sala, o jogo deve executar automaticamente o comando “examinar sala”, que descreve o novo ambiente ao jogador.
+		(X) Ao entrar numa nova sala, o jogo deve executar automaticamente o comando “examinar sala”, que descreve o novo ambiente ao jogador.
 	- Pegar [objeto]
  		(X) O jogador coleta um objeto que está na sala atual;
- 		( ) Alguns objetos não podem ser coletados, como no caso de “porta”.
+ 		(X) Alguns objetos não podem ser coletados, como no caso de “porta”.
 	- Largar [objeto]
  		(X) O jogador larga um objeto que está no seu inventório, na sala atual.
 	- Inventório
@@ -44,8 +44,8 @@ Feedback dos Comandos
 
 Todos os comandos devem retornar “mensagens de sucesso ou de erro” quando forem executados:
 
-	( ) As mensagens de sucesso devem ser transmitidas para todos os jogadores do recinto, além do próprio que fez a ação. Por exemplo, quando um jogador larga um objeto, o jogo deve responder com “objeto X foi largado pelo jogador Y”, ou quando alguém se move, “jogador X moveu-se para o sul”;
-	( ) Nos casos de erro, apenas o jogador que executou a ordem deve receber uma mensagem, como por exemplo, “não é possível mover-se para o norte” ou “objeto X não existe”.
+	(X) As mensagens de sucesso devem ser transmitidas para todos os jogadores do recinto, além do próprio que fez a ação. Por exemplo, quando um jogador larga um objeto, o jogo deve responder com “objeto X foi largado pelo jogador Y”, ou quando alguém se move, “jogador X moveu-se para o sul”;
+	(X) Nos casos de erro, apenas o jogador que executou a ordem deve receber uma mensagem, como por exemplo, “não é possível mover-se para o norte” ou “objeto X não existe”.
 	
 Objetos
 

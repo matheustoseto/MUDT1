@@ -85,7 +85,7 @@ public class Cliente : MonoBehaviour
 
     void DigitarTexto(string texto)
     {
-        ShowText(playerName, texto);
+        ShowText("", texto, idSala);
         netWorkView.RPC("Comando", RPCMode.Server, idPlayer, texto);
     }
 
@@ -106,28 +106,34 @@ public class Cliente : MonoBehaviour
     }
 
     [RPC]
-    void ShowText(string nomePlayer, string texto)
+    void ShowText(string idPlayer, string texto, string idSala)
     {
-        if(nomePlayer != "" && nomePlayer != null){
-			chatEntries.Add("[" + nomePlayer + "] " + texto);
-		} else {
-			chatEntries.Add(texto);
-		}
-        textChat = "";
+        if (this.idSala == idSala)
+        {
+            if (idPlayer != "" && idPlayer != null)
+            {
+                chatEntries.Add("[" + playerName + "] " + texto);
+            }
+            else
+            {
+                chatEntries.Add(texto);
+            }
+            textChat = "";
+        }
     }
 
     [RPC]
-    void Sendmsg(string idPlayer, string texto)
+    void Sendmsg(string idPlayer, string texto, string idSala)
     {
         if (this.idPlayer == idPlayer)
-            ShowText("", texto);
+            ShowText("", texto, idSala);
     }
 	
 	[RPC]
     void NotificaOutros(string idPlayer, string idSala, string texto)
     {
-        if (this.idSala == idSala && this.idPlayer != idPlayer)
-            ShowText("", texto);
+        if (this.idPlayer != idPlayer)
+            ShowText("", texto, idSala);
     }
 
     //Server function
