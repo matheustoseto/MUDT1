@@ -60,9 +60,9 @@ public class Cliente : MonoBehaviour
             else if (Network.peerType == NetworkPeerType.Client)
             {
                 GUILayout.Label("Cliente Connectado com sucesso!");
-                GUILayout.Label("idPlayer: " + idPlayer);
-				GUILayout.Label("idSala: " + idSala);
-                GUILayout.Label("Ping: " + Network.GetAveragePing(Network.connections[0]));
+                //GUILayout.Label("idPlayer: " + idPlayer);
+				GUILayout.Label("NomeSala: " + idSala);
+                //GUILayout.Label("Ping: " + Network.GetAveragePing(Network.connections[0]));
 
                 if (GUILayout.Button("Desconectar")) {
                     netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!");

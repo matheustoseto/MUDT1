@@ -18,7 +18,7 @@ public class MUDCommand : MonoBehaviour {
 
     public void falarChat(Player player, string texto)
     {
-        Debug.Log("falarChat: "+texto);
+        Debug.Log("falarChat: " + texto);
 
         if (texto.Contains("Examinar"))
         { // Examinar [sala/objeto]
@@ -28,7 +28,8 @@ public class MUDCommand : MonoBehaviour {
                          where item.idSala == player.idSala && item.nome == splitTexto
                          select item).FirstOrDefault();
 
-            if (sala != null) {
+            if (sala != null)
+            {
                 servidor.notificaPlayer(player.idPlayer, GerarDescricaoSala(sala.descricao, player));
                 return;
             }
@@ -40,10 +41,12 @@ public class MUDCommand : MonoBehaviour {
                                      where obj.nome == splitTexto
                                      select obj).FirstOrDefault()).FirstOrDefault();
 
-            if (objeto != null) {
+            if (objeto != null)
+            {
                 servidor.notificaPlayer(player.idPlayer, objeto.descricao);
                 return;
-            } else
+            }
+            else
             {
                 //Busca na sala
                 Objeto objTexto = buscarObjeto(splitTexto);
@@ -61,10 +64,17 @@ public class MUDCommand : MonoBehaviour {
                         Objeto obj = (from item in repositorio.objetos
                                       where item.tipo == tipoObjeto
                                       select item).First();
+
+                        if (obj.tipo == TipoObjeto.Porta)
+                        {
+                            string descrUsou = obj.usou ? obj.descricaoUsarS : obj.descricaoUsarN;
+                            servidor.notificaPlayer(player.idPlayer, obj.descricao + " " + descrUsou);
+                            return;
+                        }
                         servidor.notificaPlayer(player.idPlayer, obj.descricao);
                         return;
                     }
-                }      
+                }
             }
             servidor.notificaPlayer(player.idPlayer, "Sala ou Objeto não encontrado.");
         }
@@ -83,16 +93,36 @@ public class MUDCommand : MonoBehaviour {
                               where item.coordenada == coordenada
                               select item.sala).FirstOrDefault();
 
-            if (idSala != IdSalas.Default) {
+            if (idSala != IdSalas.Default)
+            {
+
+                if (salaAtual.objetos.Contains(TipoObjeto.Porta))
+                {
+                    Objeto objeto = (from item in repositorio.objetos
+                                     where item.tipo == TipoObjeto.Porta
+                                     select item).FirstOrDefault();
+
+                    if (!objeto.usou)
+                    {
+                        servidor.notificaPlayer(player.idPlayer, objeto.descricaoUsarN);
+                        return;
+                    }
+                }
+
                 Sala salaMover = (from item in repositorio.salas
                                   where item.idSala == idSala
                                   select item).FirstOrDefault();
-                foreach (Player pl in repositorio.players) {
+                foreach (Player pl in repositorio.players)
+                {
                     if (pl.idPlayer == player.idPlayer)
                         pl.idSala = salaMover.idSala;
                 }
+
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, salaAtual.nome, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+                servidor.SetPref(player);
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, salaMover.nome, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+
                 falarChat(player, "Examinar " + salaMover.nome);
                 return;
             }
@@ -108,29 +138,33 @@ public class MUDCommand : MonoBehaviour {
                                         select item.objetos).FirstOrDefault();
 
             Objeto objeto = (from obj in repositorio.objetos
-                            where objetos.Contains(obj.tipo) && obj.nome == splitTexto
-                            select obj).FirstOrDefault();
+                             where objetos.Contains(obj.tipo) && obj.nome == splitTexto
+                             select obj).FirstOrDefault();
 
-            Debug.Log("objeto: "+ objeto);
+            Debug.Log("objeto: " + objeto);
 
             if (objeto != null)
             {
-				
-				if(!objeto.pegar){
-					servidor.notificaPlayer(player.idPlayer, "Esse objeto não é permitido coletar.");
-					return;
-				}					
-				
+
+                if (!objeto.pegar)
+                {
+                    servidor.notificaPlayer(player.idPlayer, "Esse objeto não é permitido coletar.");
+                    return;
+                }
+
                 foreach (Inventario inventario in repositorio.inventarios)
                     if (inventario.idPlayer == player.idPlayer)
                         inventario.objetos.Add(objeto);
 
                 foreach (Sala sala in repositorio.salas)
                     if (sala.idSala == player.idSala)
+                    {
                         sala.objetos.Remove(objeto.tipo);
+                        break;
+                    }
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto adicionado no seu inventario.");
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " pegou o objeto " + objeto.nome);
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, BuscarSalaByIdSala(player.idSala).nome, "Jogador " + player.nome + " pegou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não encontrado na sala.");
@@ -144,24 +178,27 @@ public class MUDCommand : MonoBehaviour {
                              where obj.nome == splitTexto
                              select obj).FirstOrDefault();
 
-            Debug.Log("objeto: " + objeto);
+            Inventario inv = (from item in repositorio.inventarios
+                              where item.idPlayer == player.idPlayer && item.objetos.Contains(objeto)
+                              select item).FirstOrDefault();
 
-            if (objeto != null)
+            if (objeto != null && inv != null)
             {
-                Inventario inv = (from item in repositorio.inventarios
-                                  where item.idPlayer == player.idPlayer
-                                  select item).FirstOrDefault();
-
                 foreach (Objeto obj in inv.objetos)
                     if (obj.nome == splitTexto)
+                    {
                         inv.objetos.Remove(obj);
+                        break;
+                    }
+
+                Debug.Log("Removeu do inventario!!!");
 
                 foreach (Sala sala in repositorio.salas)
                     if (sala.idSala == player.idSala)
                         sala.objetos.Add(objeto.tipo);
 
                 servidor.notificaPlayer(player.idPlayer, "Objeto removido do inventario.");
-				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + "largou o objeto " + objeto.nome);
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, BuscarSalaByIdSala(player.idSala).nome, "Jogador " + player.nome + " largou o objeto " + objeto.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Objeto não foi encontrado no inventario.");
@@ -174,7 +211,8 @@ public class MUDCommand : MonoBehaviour {
                                      select item).FirstOrDefault();
             string objetos = "Você possui os seguintes objetos: ";
 
-            if (inventario != null && inventario.objetos.Count > 0) {
+            if (inventario != null && inventario.objetos.Count > 0)
+            {
                 foreach (Objeto obj in inventario.objetos)
                     objetos += obj.nome + " - ";
                 servidor.notificaPlayer(player.idPlayer, objetos);
@@ -185,48 +223,75 @@ public class MUDCommand : MonoBehaviour {
         else
         if (texto.Contains("Usar"))
         { // Usar [objeto] {alvo}
-            string[] splitTexto = texto.Split(null);
-            Objeto objeto = buscarObjeto(splitTexto[1]);
-            Objeto alvo = buscarObjeto(splitTexto[2]);
+            string[] splitTexto = texto.Replace("Usar ", "").Split(null);
 
-			if (objeto != null && alvo != null){
-	
-				//Implementar objeto porta
-				//Só pode usar objeto => alvo em porta, o resto retorna que não é possivel
-				//Verificar se objeto porta esta na mesma sala
-	
-				servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
-			} else if (objeto != null){
-				if (!verificaInventario(player, objeto)){
-					servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
-					return;
-				}
-				servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto.tipo));
-			}    
+            Objeto objeto = buscarObjeto(splitTexto[0]);
+            Objeto alvo = null;
+
+            if (splitTexto.Length > 1)
+                alvo = buscarObjeto(splitTexto[1]);
+
+            if (objeto != null && alvo != null)
+            {
+
+                if (objeto.tipo == TipoObjeto.Chave && alvo.tipo == TipoObjeto.Porta)
+                {
+                    servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(player, objeto.tipo, alvo.tipo));
+                    return;
+                }
+                else
+                {
+                    servidor.notificaPlayer(player.idPlayer, "Você não pode usar esse objeto nesse alvo.");
+                    return;
+                }
+            }
+            else if (objeto != null)
+            {
+                if (!verificaInventario(player, objeto))
+                {
+                    servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
+                    return;
+                }
+                servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto.tipo));
+                return;
+            }
+            servidor.notificaPlayer(player.idPlayer, "Objeto ou Alvo não encontrado.");
         }
         else
         if (texto.Contains("Falar"))
         { // Falar [texto]
-            servidor.NotificaTodosPlayers(player.nome, texto.Replace("Falar ",""));
+            servidor.NotificaTodosPlayers(player.idPlayer, texto.Replace("Falar ", ""), BuscarSalaByIdSala(player.idSala).nome);
         }
         else
         if (texto.Contains("Cochichar"))
         { // Cochichar [texto] [jogador]
-			string splitTexto = texto.Split(null)[1];
-			string jogador = texto.Split(null)[2];
+            string[] fala = texto.Replace("Cochichar ", "").Split(null);
+            string jogador = fala[fala.Length - 1].Replace(" ", "");
+
+            string splitTexto = "";
+            foreach (string f in fala)
+                splitTexto = splitTexto + f + " ";
+
+            splitTexto = splitTexto.Replace(jogador, "");
 
             Debug.Log(splitTexto);
             Debug.Log(jogador);
 
             Player plyer = buscarPlayerByName(jogador);
-			
-			servidor.notificaPlayer(plyer.idPlayer, "O jogador " + player.nome + " enviou uma mensagem: " + splitTexto);
+
+            if (plyer == null)
+            {
+                servidor.notificaPlayer(plyer.idPlayer, "Jogador não encontrado.");
+                return;
+            }
+
+            servidor.notificaPlayer(plyer.idPlayer, "O jogador " + player.nome + " enviou uma mensagem: " + splitTexto);
         }
         else
         if (texto.Contains("Ajuda"))
         { // Ajuda
-			
-            string ajuda =  "Lista de Comandos: \n"
+
+            string ajuda = "Lista de Comandos: \n"
                     + "Examinar [sala/objeto] \n"
                     + "Mover [N/S/L/O] \n"
                     + "Pegar [objeto] \n"
@@ -235,52 +300,81 @@ public class MUDCommand : MonoBehaviour {
                     + "Usar [objeto] {alvo} \n"
                     + "Falar [texto] \n"
                     + "Cochichar [texto] [jogador] \n";
-					
-			servidor.notificaPlayer(player.idPlayer, ajuda);
-        }else{
-			servidor.notificaPlayer(player.idPlayer, "Não Foi Possível Realizar Essa Ação.");
-		}
+
+            servidor.notificaPlayer(player.idPlayer, ajuda);
+        }
+        else
+        {
+            servidor.notificaPlayer(player.idPlayer, "Não Foi Possível Realizar Essa Ação.");
+        }
     }
 
     public bool verificaInventario(Player player, Objeto objeto)
     {
-		Objeto obj = (from item in repositorio.inventarios
-					  where item.idPlayer == player.idPlayer
-					  select (from objet in item.objetos
-							 where objet.tipo == objeto.tipo
-							 select objet).FirstOrDefault()).FirstOrDefault();
-							 
+        Objeto obj = (from item in repositorio.inventarios
+                      where item.idPlayer == player.idPlayer
+                      select (from objet in item.objetos
+                              where objet.tipo == objeto.tipo
+                              select objet).FirstOrDefault()).FirstOrDefault();
+
         return (obj != null);
     }
 
     public string usarObjeto(Player player, TipoObjeto objeto)
     {
         foreach (Inventario inventario in repositorio.inventarios)
-			if (inventario.idPlayer == player.idPlayer){
-				foreach(Objeto obj in inventario.objetos)
-					if(obj.tipo == objeto){
-						if(obj.usar){
-							obj.usar = false;
-							return obj.descricaoUsarN;
-						} else {
-							obj.usar = true;
-							return obj.descricaoUsarS;
-						}
-					}					
-			}
-        return "";
+            if (inventario.idPlayer == player.idPlayer)
+            {
+                foreach (Objeto obj in inventario.objetos)
+                    if (obj.tipo == objeto && obj.usar)
+                    {
+                        if (obj.usou)
+                        {
+                            obj.usou = false;
+                            return obj.descricaoUsarN;
+                        }
+                        else
+                        {
+                            obj.usou = true;
+                            return obj.descricaoUsarS;
+                        }
+                    }
+            }
+        return "Você não pode usar esse objeto.";
     }
 
-    public string usarObjetoAlvo(TipoObjeto objeto, TipoObjeto alvo)
+    public string usarObjetoAlvo(Player player, TipoObjeto objeto, TipoObjeto alvo)
     {
-        return null;
+        foreach (Sala sala in repositorio.salas)
+            if (sala.idSala == player.idSala && sala.objetos.Contains(alvo))
+            {
+                Objeto obj = (from item in repositorio.objetos
+                              where item.tipo == alvo
+                              select item).FirstOrDefault();
+
+                if (obj.usar)
+                {
+                    if (obj.usou)
+                    {
+                        obj.usou = false;
+                        return obj.descricaoUsarN;
+                    }
+                    else
+                    {
+                        obj.usou = true;
+                        return obj.descricaoUsarS;
+                    }
+                }
+
+            }
+        return "Você não pode usar esse objeto.";
     }
 
     public Objeto buscarObjeto(string nomeObjeto)
     {
         return (from item in repositorio.objetos
-				where item.nome == nomeObjeto
-				select item).FirstOrDefault();
+                where item.nome == nomeObjeto
+                select item).FirstOrDefault();
     }
 
     public Player buscarPlayerById(string idPlayer)
@@ -290,7 +384,7 @@ public class MUDCommand : MonoBehaviour {
                          select item).FirstOrDefault();
         return player;
     }
-	
+
     public Player buscarPlayerByName(string nome)
     {
         Player player = (from item in repositorio.players
@@ -298,73 +392,87 @@ public class MUDCommand : MonoBehaviour {
                          select item).FirstOrDefault();
         return player;
     }
-	
-	public Sala BuscarSalaByIdSala(IdSalas idSala){
-		Sala sala = (from item in repositorio.salas
-					 where item.idSala == idSala
-					 select item).FirstOrDefault();
-		
-		return sala;
-	}
-	
-	public Coordenadas BuscarCoordenada(string cd){
-		if("N".Contains(cd))
-			return Coordenadas.Norte;
-		if("S".Contains(cd))
-			return Coordenadas.Sul;
-		if("L".Contains(cd))
-			return Coordenadas.Leste;
-		if("O".Contains(cd))
-			return Coordenadas.Oeste;
-		
-		return Coordenadas.Default;
-	}
-	
-	public IdSalas BuscarIdSalas(string cd){
-		if("Sala1".Contains(cd))
-			return IdSalas.Sala1;
-		if("Sala2".Contains(cd))
-			return IdSalas.Sala2;
-		if("Sala3".Contains(cd))
-			return IdSalas.Sala3;
-		if("Sala4".Contains(cd))
-			return IdSalas.Sala4;
-		if("Sala5".Contains(cd))
-			return IdSalas.Sala5;
-		
-		return IdSalas.Default;
-	}
-	
-	public void AdicionaObjetoSala(string cdSala, string texto){
-		
-		IdSalas idSala = BuscarIdSalas(cdSala);
-		
-		if(idSala == IdSalas.Default){
-			servidor.AdicionaTextoByIdSala(idSala, "Sala não encontrado!");
-			return;
-		}
 
-		Objeto objeto = (from item in repositorio.salas
-				 where item.idSala == idSala
-				 select (from tipo in item.objetos
-						 select (from obj in repositorio.objetos
-								 where obj.tipo == tipo && obj.nome == texto
-								 select obj).FirstOrDefault()).FirstOrDefault()).FirstOrDefault();
-								 
-		if (objeto != null){
-			foreach (Sala sala in repositorio.salas)
-					if (sala.idSala == idSala)
-						sala.objetos.Add(objeto.tipo);
-					
-			servidor.AdicionaTextoByIdSala(idSala, "Objeto " + objeto.tipo + "adicionado!");
-			return;
-		}	
-		servidor.AdicionaTextoByIdSala(idSala, "Objeto não encontrado!");				
-	}
-	
-	public string GerarDescricaoSala(string texto, Player player){
-		
-		string descricao = texto;
+    public Sala BuscarSalaByIdSala(IdSalas idSala)
+    {
+        Sala sala = (from item in repositorio.salas
+                     where item.idSala == idSala
+                     select item).FirstOrDefault();
+
+        return sala;
+    }
+
+    public Player BuscarPlayerByNetwork(NetworkPlayer network)
+    {
+        return (from item in repositorio.players
+                where item.networkPlayer == network
+                select item).FirstOrDefault();
+    }
+
+    public Coordenadas BuscarCoordenada(string cd)
+    {
+        if ("N".Contains(cd))
+            return Coordenadas.Norte;
+        if ("S".Contains(cd))
+            return Coordenadas.Sul;
+        if ("L".Contains(cd))
+            return Coordenadas.Leste;
+        if ("O".Contains(cd))
+            return Coordenadas.Oeste;
+
+        return Coordenadas.Default;
+    }
+
+    public IdSalas BuscarIdSalas(string cd)
+    {
+        if ("Sala1".Contains(cd))
+            return IdSalas.Sala1;
+        if ("Sala2".Contains(cd))
+            return IdSalas.Sala2;
+        if ("Sala3".Contains(cd))
+            return IdSalas.Sala3;
+        if ("Sala4".Contains(cd))
+            return IdSalas.Sala4;
+        if ("Sala5".Contains(cd))
+            return IdSalas.Sala5;
+
+        return IdSalas.Default;
+    }
+
+    public void AdicionaObjetoSala(string cdSala, string texto)
+    {
+
+        IdSalas idSala = BuscarIdSalas(cdSala);
+
+        if (idSala == IdSalas.Default)
+        {
+            servidor.AdicionaTextoByIdSala(idSala, "Sala não encontrado!");
+            return;
+        }
+
+        Objeto objeto = (from item in repositorio.salas
+                         where item.idSala == idSala
+                         select (from tipo in item.objetos
+                                 select (from obj in repositorio.objetos
+                                         where obj.tipo == tipo && obj.nome == texto
+                                         select obj).FirstOrDefault()).FirstOrDefault()).FirstOrDefault();
+
+        if (objeto != null)
+        {
+            foreach (Sala sala in repositorio.salas)
+                if (sala.idSala == idSala)
+                    sala.objetos.Add(objeto.tipo);
+
+            servidor.AdicionaTextoByIdSala(idSala, "Objeto " + objeto.tipo + " adicionado!");
+            return;
+        }
+        servidor.AdicionaTextoByIdSala(idSala, "Objeto não encontrado!");
+    }
+
+    public string GerarDescricaoSala(string texto, Player player)
+    {
+
+        string descricao = texto;
 
         List<Player> jogadores = (from item in repositorio.players
                                   where item.idSala == player.idSala
@@ -373,29 +481,29 @@ public class MUDCommand : MonoBehaviour {
         string qntJogadores = jogadores.Count.ToString();
 
         List<TipoObjeto> tipoObjeto = (from item in repositorio.salas
-                                        where item.idSala == player.idSala
-                                        select item.objetos).FirstOrDefault();
-									
-		List<Objeto> objs = (from item in repositorio.objetos
-							 where tipoObjeto.Contains(item.tipo)
-							 select item).ToList();
-							 
-		string objtsTexto = "";
-		foreach(Objeto obj in objs)
-			objtsTexto = objtsTexto + obj.nome + " - ";
-			
-		string salasAdj = "";
-		List<SalasLigadas> salasLigadas = (from item in repositorio.salas
-											where item.idSala == player.idSala
-											select item.salasLigadas).FirstOrDefault();
-		
-		foreach(SalasLigadas sl in salasLigadas)
-            salasAdj= salasAdj + "A/Ao " + sl.coordenada + " possui uma porta para a sala " + BuscarSalaByIdSala(sl.sala).nome + ". ";									
-		
-		descricao = descricao.Replace("XJ",qntJogadores);
-		descricao = descricao.Replace("XOBJ",objtsTexto);
-		descricao = descricao.Replace("XCS",salasAdj);
-		
-		return descricao;
-	}
+                                       where item.idSala == player.idSala
+                                       select item.objetos).FirstOrDefault();
+
+        List<Objeto> objs = (from item in repositorio.objetos
+                             where tipoObjeto.Contains(item.tipo)
+                             select item).ToList();
+
+        string objtsTexto = "";
+        foreach (Objeto obj in objs)
+            objtsTexto = objtsTexto + obj.nome + " - ";
+
+        string salasAdj = "";
+        List<SalasLigadas> salasLigadas = (from item in repositorio.salas
+                                           where item.idSala == player.idSala
+                                           select item.salasLigadas).FirstOrDefault();
+
+        foreach (SalasLigadas sl in salasLigadas)
+            salasAdj = salasAdj + sl.coordenada + " possui uma porta para a sala " + BuscarSalaByIdSala(sl.sala).nome + ". ";
+
+        descricao = descricao.Replace("XJ", qntJogadores);
+        descricao = descricao.Replace("XOBJ", objtsTexto);
+        descricao = descricao.Replace("XCS", salasAdj);
+
+        return descricao;
+    }
 }

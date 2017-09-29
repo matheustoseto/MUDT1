@@ -52,10 +52,19 @@ public class MUDServidor : MonoBehaviour {
         if (Network.peerType == NetworkPeerType.Server)
         {
             servidorUI.QtdConnections = Network.connections.Length;
-        }
 
-
-        
+            // Atualiza MessageArea
+            foreach (ChatEntries chat in chatEntries)
+            {
+                if (chat.idSala == idSalaAtual)
+                {
+                    servidorUI.MessageArea = chat.idSala.ToString() + "\n";
+                    foreach (string txt in chat.chat)
+                        //GUILayout.Label(txt);
+                        servidorUI.MessageArea += txt + "\n";
+                }
+            }
+        }    
     }
 
     void Awake()
@@ -123,19 +132,6 @@ public class MUDServidor : MonoBehaviour {
                 idSalaAtual = IdSalas.Sala1;
                 break;
         }
-
-        // Atualiza MessageArea
-        foreach (ChatEntries chat in chatEntries)
-        {
-            if (chat.idSala == idSalaAtual)
-            {
-                servidorUI.MessageArea = chat.idSala.ToString() + "\n";
-                foreach (string txt in chat.chat)
-                    //GUILayout.Label(txt);
-                    servidorUI.MessageArea += txt + "\n";
-            }
-        }
-
     }
 
     public void AdicionarItem()
@@ -246,6 +242,8 @@ public class MUDServidor : MonoBehaviour {
     private void OnPlayerDisconnected(NetworkPlayer player)
     {
         Debug.Log("Player disconnected from: " + player.ipAddress + ":" + player.port);
+
+        repositorio.players.Remove(comandos.BuscarPlayerByNetwork(player));
     }
 
     private void OnFailedToConnectToMasterServer(NetworkConnectionError info)
@@ -283,10 +281,12 @@ public class MUDServidor : MonoBehaviour {
 
         string txt = "Jogador " + name + " se connectou!";
 
-        NotificaTodosPlayers("", txt);
+        NotificaTodosPlayers("", txt, comandos.BuscarSalaByIdSala(player.idSala).nome);
         AdicionaTextoByIdSala(IdSalas.Sala1, txt);
 
-        info.networkView.RPC("SetPlayerPref", RPCMode.All, name, player.idPlayer, player.idSala.ToString());
+        string nomeSala = comandos.BuscarSalaByIdSala(player.idSala).nome;
+
+        info.networkView.RPC("SetPlayerPref", RPCMode.All, name, player.idPlayer, nomeSala);
         comandos.falarChat(player, "Examinar " + comandos.BuscarSalaByIdSala(player.idSala).nome);
     }
 
@@ -299,21 +299,20 @@ public class MUDServidor : MonoBehaviour {
         comandos.falarChat(player, texto);
     }
 
-    public void NotificaTodosPlayers(string nomePlayer, string texto)
+    public void NotificaTodosPlayers(string idPlayer, string texto, string idSala)
     {
-        netWorkView.RPC("ShowText", RPCMode.All, nomePlayer, texto);
+        netWorkView.RPC("ShowText", RPCMode.All, idPlayer, texto, idSala);
     }
 
-    public void NotificaOutrosPlayersBySala(Player player, string texto)
+    public void NotificaOutrosPlayersBySala(string idPlayer, string idSala, string texto)
     {
-        netWorkView.RPC("NotificaOutros", RPCMode.Others, player.idPlayer, player.idSala.ToString(), texto);
+        netWorkView.RPC("NotificaOutros", RPCMode.Others, idPlayer, idSala, texto);
     }
 
     public void notificaPlayer(string idPlayer, string texto)
     {
-        Debug.Log(idPlayer);
-        Debug.Log(texto);
-        netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto);
+        string nomeSala = comandos.BuscarSalaByIdSala(comandos.buscarPlayerById(idPlayer).idSala).nome;
+        netWorkView.RPC("Sendmsg", RPCMode.All, idPlayer, texto, nomeSala);
     }
 
     void AdicionaTexto(Player player, string texto)
@@ -340,14 +339,19 @@ public class MUDServidor : MonoBehaviour {
         }
     }
 
+    public void SetPref(Player player)
+    {
+        netWorkView.RPC("SetPlayerPref", RPCMode.All, player.nome, player.idPlayer, comandos.BuscarSalaByIdSala(player.idSala).nome);
+    }
+
     //Client function
     //As funções do cliente devem ser declaradas no servidor porém vazias
     [RPC]
     void SetPlayerPref(string playerName, string idPlayer, string idSala) { }
     [RPC]
-    void ShowText(string nomePlayer, string texto) { }
+    void ShowText(string nomePlayer, string texto, string idSala) { }
     [RPC]
-    void Sendmsg(string idPlayer, string texto) { }
+    void Sendmsg(string idPlayer, string texto, string idSala) { }
     [RPC]
     void NotificaOutros(string idPlayer, string idSala, string texto) { }
 }
