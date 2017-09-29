@@ -52,7 +52,7 @@ Objetos
 	O jogo deve ter no mínimo os seguintes objetos:
 	
 	- Porta
-		( ) Item não coletável que necessita de uma chave para ser aberta;
+		(X) Item não coletável que necessita de uma chave para ser aberta;
 		( ) “Examinar porta” retorna se a mesma encontra-se aberta ou fechada;
 		( ) Ao tentar mover-se na direção onde a porta está posicionada, o jogador poderá prosseguir apenas se ela estiver aberta.
 	- Chave

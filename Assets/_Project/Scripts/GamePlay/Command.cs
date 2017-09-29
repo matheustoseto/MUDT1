@@ -61,6 +61,13 @@ public class Command : MonoBehaviour {
                         Objeto obj = (from item in repositorio.objetos
                                       where item.tipo == tipoObjeto
                                       select item).First();
+
+                        if (obj.tipo == TipoObjeto.Porta)
+                        {
+                            string descrUsou = obj.usou ? obj.descricaoUsarS : obj.descricaoUsarN;
+                            servidor.notificaPlayer(player.idPlayer, obj.descricao + " " + descrUsou);
+                            return;
+                        }
                         servidor.notificaPlayer(player.idPlayer, obj.descricao);
                         return;
                     }
@@ -84,6 +91,20 @@ public class Command : MonoBehaviour {
                               select item.sala).FirstOrDefault();
 
             if (idSala != IdSalas.Default) {
+
+                if (salaAtual.objetos.Contains(TipoObjeto.Porta))
+                {
+                    Objeto objeto = (from item in repositorio.objetos
+                                     where item.tipo == TipoObjeto.Porta
+                                     select item).FirstOrDefault();
+
+                    if (!objeto.usou)
+                    {
+                        servidor.notificaPlayer(player.idPlayer, objeto.descricaoUsarN);
+                        return;
+                    }
+                }
+
                 Sala salaMover = (from item in repositorio.salas
                                   where item.idSala == idSala
                                   select item).FirstOrDefault();
@@ -202,19 +223,23 @@ public class Command : MonoBehaviour {
                 alvo = buscarObjeto(splitTexto[1]);
 
 			if (objeto != null && alvo != null){
-	
-				//Implementar objeto porta
-				//Só pode usar objeto => alvo em porta, o resto retorna que não é possivel
-				//Verificar se objeto porta esta na mesma sala
-	
-				servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(objeto.tipo, alvo.tipo));
+
+                if (objeto.tipo == TipoObjeto.Chave && alvo.tipo == TipoObjeto.Porta)
+                {
+                    servidor.notificaPlayer(player.idPlayer, usarObjetoAlvo(player, objeto.tipo, alvo.tipo));
+                }
+                else
+                {
+                    servidor.notificaPlayer(player.idPlayer, "Você não pode usar esse objeto nesse alvo.");
+                }
 			} else if (objeto != null){
 				if (!verificaInventario(player, objeto)){
 					servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
 					return;
 				}
 				servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto.tipo));
-			}    
+			}
+            servidor.notificaPlayer(player.idPlayer, "Objeto ou Alvo não encontrado.");
         }
         else
         if (texto.Contains("Falar"))
@@ -237,7 +262,13 @@ public class Command : MonoBehaviour {
             Debug.Log(jogador);
 
             Player plyer = buscarPlayerByName(jogador);
-			
+
+            if(plyer == null)
+            {
+                servidor.notificaPlayer(plyer.idPlayer, "Jogador não encontrado.");
+                return;
+            }
+
 			servidor.notificaPlayer(plyer.idPlayer, "O jogador " + player.nome + " enviou uma mensagem: " + splitTexto);
         }
         else
@@ -289,9 +320,31 @@ public class Command : MonoBehaviour {
         return "Você não pode usar esse objeto.";
     }
 
-    public string usarObjetoAlvo(TipoObjeto objeto, TipoObjeto alvo)
+    public string usarObjetoAlvo(Player player, TipoObjeto objeto, TipoObjeto alvo)
     {
-        return null;
+        foreach (Sala sala in repositorio.salas)
+            if (sala.idSala == player.idSala && sala.objetos.Contains(alvo))
+            {
+                Objeto obj = (from item in repositorio.objetos
+                                 where item.tipo == alvo
+                                 select item).FirstOrDefault();
+
+                if (obj.usar)
+                {
+                    if (obj.usou)
+                    {
+                        obj.usou = false;
+                        return obj.descricaoUsarN;
+                    }
+                    else
+                    {
+                        obj.usou = true;
+                        return obj.descricaoUsarS;
+                    }
+                }
+
+            }
+        return "Você não pode usar esse objeto.";
     }
 
     public Objeto buscarObjeto(string nomeObjeto)

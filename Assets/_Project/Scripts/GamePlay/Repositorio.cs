@@ -21,7 +21,9 @@ public enum TipoObjeto
     Rocha,
     Lago,
     Ponte_Para_Pesca,
-    Fogueira
+    Fogueira,
+    Porta,
+    Chave
 }
 
 public enum IdSalas
