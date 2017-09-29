@@ -53,9 +53,9 @@ Objetos
 	
 	- Porta
 		(X) Item não coletável que necessita de uma chave para ser aberta;
-		( ) “Examinar porta” retorna se a mesma encontra-se aberta ou fechada;
-		( ) Ao tentar mover-se na direção onde a porta está posicionada, o jogador poderá prosseguir apenas se ela estiver aberta.
+		(X) “Examinar porta” retorna se a mesma encontra-se aberta ou fechada;
+		(X) Ao tentar mover-se na direção onde a porta está posicionada, o jogador poderá prosseguir apenas se ela estiver aberta.
 	- Chave
-		( ) Item coletável que pode ser utilizado em uma ou mais portas.
+		(X) Item coletável que pode ser utilizado em uma ou mais portas.
 	- Mapa
 		( ) Ao utilizá-lo, o jogo desenha em “ASCII art” o mapa do MUD, indicando em qual sala o jogador se encontra.
