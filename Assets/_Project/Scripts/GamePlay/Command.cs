@@ -93,6 +93,7 @@ public class Command : MonoBehaviour {
                 }
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
 				servidor.NotificaOutrosPlayersBySala(player, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+                falarChat(player, "Examinar " + salaMover.nome);
                 return;
             }
             servidor.notificaPlayer(player.idPlayer, "Não foi possivel mover para a sala descrita.");
@@ -193,7 +194,7 @@ public class Command : MonoBehaviour {
 					servidor.notificaPlayer(player.idPlayer, "Você não possui esse objeto.");
 					return;
 				}
-				servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto));
+				servidor.notificaPlayer(player.idPlayer, usarObjeto(player, objeto.tipo));
 			}    
         }
         else
@@ -250,16 +251,17 @@ public class Command : MonoBehaviour {
         foreach (Inventario inventario in repositorio.inventarios)
 			if (inventario.idPlayer == player.idPlayer){
 				foreach(Objeto obj in inventario.objetos)
-					if(obj.tipo == objeto.tipo){
+					if(obj.tipo == objeto){
 						if(obj.usar){
 							obj.usar = false;
-							obj.descricaoUsarN;
+							return obj.descricaoUsarN;
 						} else {
 							obj.usar = true;
-							obj.descricaoUsarS;
+							return obj.descricaoUsarS;
 						}
 					}					
 			}
+        return "";
     }
 
     public string usarObjetoAlvo(TipoObjeto objeto, TipoObjeto alvo)
@@ -356,36 +358,36 @@ public class Command : MonoBehaviour {
 	public string GerarDescricaoSala(string texto, Player player){
 		
 		string descricao = texto;
-		
-		List<Player> jogadores = (from item in repositorio.players
-						  where item.idSala = player.idSala
-						  select item).List();
-		
-		string qntJogadores = jogadores.Count;
-		
-		List<TipoObjeto> tipoObjetos = (from item in repositorio.salas
-										where item.idSala == player.idSala
-										select item.objetos).List();
+
+        List<Player> jogadores = (from item in repositorio.players
+                                  where item.idSala == player.idSala
+                                  select item).ToList();
+
+        string qntJogadores = jogadores.Count.ToString();
+
+        List<TipoObjeto> tipoObjeto = (from item in repositorio.salas
+                                        where item.idSala == player.idSala
+                                        select item.objetos).FirstOrDefault();
 									
 		List<Objeto> objs = (from item in repositorio.objetos
-							 where item.tipo == tipoObjeto
-							 select item).List();
+							 where tipoObjeto.Contains(item.tipo)
+							 select item).ToList();
 							 
 		string objtsTexto = "";
 		foreach(Objeto obj in objs)
-			objtsTexto.concat(obj.nome).concat(" - ");
+			objtsTexto = objtsTexto + obj.nome + " - ";
 			
 		string salasAdj = "";
 		List<SalasLigadas> salasLigadas = (from item in repositorio.salas
 											where item.idSala == player.idSala
-											select item.salasLigadas).List();
+											select item.salasLigadas).FirstOrDefault();
 		
 		foreach(SalasLigadas sl in salasLigadas)
-			salasAdj.concat("A/Ao ").concat(sl.coordenada).concat(" possui uma porta para a sala ").concat(BuscarSalaByIdSala(sl.sala).nome).concat(". ");									
+            salasAdj= salasAdj + "A/Ao " + sl.coordenada + " possui uma porta para a sala " + BuscarSalaByIdSala(sl.sala).nome + ". ";									
 		
-		descricao = descricao.Repleace("XJ",qntJogadores);
-		descricao = descricao.Repleace("XOBJ",objtsTexto);
-		descricao = descricao.Repleace("XCS",salasAdj);
+		descricao = descricao.Replace("XJ",qntJogadores);
+		descricao = descricao.Replace("XOBJ",objtsTexto);
+		descricao = descricao.Replace("XCS",salasAdj);
 		
 		return descricao;
 	}

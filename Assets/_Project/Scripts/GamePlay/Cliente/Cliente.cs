@@ -124,9 +124,9 @@ public class Cliente : MonoBehaviour
     }
 	
 	[RPC]
-    void NotificaOutros(string idSala, string texto)
+    void NotificaOutros(string idPlayer, string idSala, string texto)
     {
-        if (this.idSala == idSala)
+        if (this.idSala == idSala && this.idPlayer != idPlayer)
             ShowText("", texto);
     }
 

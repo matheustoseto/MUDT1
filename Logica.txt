@@ -26,7 +26,7 @@ Sala 1 ( Taverna )
 Examinar: Você está em um quarto fechado, com X jogadores neste momento. Nesta sala contém um Machado, 
 uma carta e duas moedas. A leste possui uma porta para a sala 2.
 
-DePara: Você está em um quarto fechado, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+DePara: Você está na sala Taverna, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
 
 
 Sala 2 ( Vila )
@@ -34,28 +34,28 @@ Sala 2 ( Vila )
 Examinar: Você está em uma vila aberta, com X jogadores neste momento e um NPC chamado X. Nesta sala contém uma Vara de Pescar, 5 moedas, uma Tocha e uma bota. 
 A Oeste possui uma porta para a sala 1. A Leste possui uma porta para a sala 3. Ao Sul possui uma porta para a sala 4.
 
-DePara: Você está em uma vila aberta, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+DePara: Você está na sala Vila, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
 
 Sala 3 ( Floresta )
 
 Examinar: Você está em uma floresta aberta, com X jogadores neste momento. Nesta sala contém Árvores. 
 A Oeste possui uma porta para a sala 2. A Leste possui uma porta para a sala 5.
 
-DePara: Você está em uma floresta aberta, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+DePara: Você está na sala Floresta, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
 
 Sala 4 ( Lago )
 
 Examinar: Você está em um lago, com X jogadores neste momento. Nesta sala contém árvores, um lago e uma ponte para pesca. 
 Ao norte possui uma porta para a sala 2.
 
-DePara: Você está em um lago, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+DePara: Você está na sala Lago, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
 
 Sala 5 ( Caverna )
 
 Examinar: Você está em uma caverna, com X jogadores neste momento. Nesta sala contém rochas, uma espada e um mapa.
 A Oeste possui uma porta para a sala 3.
 
-DePara: Você está em uma caverna, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
+DePara: Você está na sala Caverna, com XJ jogadores neste momento. Nesta sala contém XOBJ. XCS
 
 
 Objetos:
