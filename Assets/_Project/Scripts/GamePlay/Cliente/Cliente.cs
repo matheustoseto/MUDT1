@@ -62,6 +62,7 @@ public class Cliente : MonoBehaviour
                 GUILayout.Label("Cliente Connectado com sucesso!");
                 //GUILayout.Label("idPlayer: " + idPlayer);
 				GUILayout.Label("NomeSala: " + idSala);
+                GUILayout.Label("NomeJogador: " + playerName);
                 //GUILayout.Label("Ping: " + Network.GetAveragePing(Network.connections[0]));
 
                 if (GUILayout.Button("Desconectar")) {
