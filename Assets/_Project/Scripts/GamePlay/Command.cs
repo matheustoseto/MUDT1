@@ -95,7 +95,8 @@ public class Command : MonoBehaviour {
                 servidor.NotificaOutrosPlayersBySala(player.idPlayer, salaAtual.nome, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
                 servidor.SetPref(player);
                 servidor.notificaPlayer(player.idPlayer, "Você se moveu para a sala " + salaMover.nome);
-   
+                servidor.NotificaOutrosPlayersBySala(player.idPlayer, salaMover.nome, "Jogador " + player.nome + " moveu-se para a sala " + salaMover.nome);
+
                 falarChat(player, "Examinar " + salaMover.nome);
                 return;
             }

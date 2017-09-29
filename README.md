@@ -31,7 +31,7 @@ O MUD deve suportar a lista de comandos e objetos citados abaixo.
 	- Inventório
  		(X) O jogo lista todos os objetos carregados atualmente pelo jogador.
 	- Usar [objeto] {alvo}
- 		( ) O jogador usa o objeto mencionado;
+ 		(X) O jogador usa o objeto mencionado;
  		( ) Em alguns casos específicos, o objeto indicado necessitará de outro (alvo) para ser ativado (ex: usar chave porta).
 	- Falar [texto]
 		(X) O jogador envia um texto que será retransmitido para todos os jogadores presentes na sala atual.
