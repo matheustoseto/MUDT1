@@ -7,7 +7,7 @@ public class ConnectMUD : MonoBehaviour
     [SerializeField]
     private ConnectionMudUI connectMudUI;
 
-    [SerializeField] private ChatMudUI chatMudUI;
+    [SerializeField] private MUDClienteUI chatMudUI;
 
     [SerializeField]
     private string connectToIP = "127.0.0.1";

@@ -9,10 +9,15 @@ public class Cliente : MonoBehaviour
     public int connectPort = 25001;
     public string playerName;
     private string idPlayer;
-	private string idSala;
+    private string idSala;
     private NetworkView netWorkView;
     public string textChat;
     private List<string> chatEntries = new List<string>();
+
+
+    // UI Componentes
+    public MUDClienteUI clienteUI;
+    private bool isConectado = false;
 
     // Use this for initialization
     void Start()
@@ -27,12 +32,49 @@ public class Cliente : MonoBehaviour
             DigitarTexto(textChat);
     }
 
+
+
+    public void ConectarCliente()
+    {
+        if (!isConectado)
+        {
+            if (Network.peerType == NetworkPeerType.Disconnected)
+            {
+
+                //We are currently disconnected: Not a client or host
+                //clienteUI.AddMessage("Cliente desconectado.");
+
+                connectToIP = clienteUI.Address;
+                connectPort = clienteUI.Port;
+                playerName = clienteUI.NamePlayer;
+
+                clienteUI.AddMessage("Conectando ao servidor...");
+                //Connect to the "connectToIP" and "connectPort" as entered via the GUI
+                //Ignore the NAT for now
+                Network.useNat = false;
+                Network.Connect(connectToIP, connectPort);
+                clienteUI.ButtonConnectName = "DESCONECTAR";
+            }
+        }
+        else
+        {
+            clienteUI.ConnectMessage = "Cliente: Desconectado";
+            clienteUI.ButtonConnectName = "Conectar ao\n"
+                                         + "SERVIDOR";
+            netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!");
+            Network.Disconnect(200);
+            isConectado = false;
+        }
+    }
+
+
     public void OnGUI()
     {
         if (Network.peerType == NetworkPeerType.Disconnected)
         {
             //We are currently disconnected: Not a client or host
-            GUILayout.Label("Cliente desconectado.");
+            //GUILayout.Label("Cliente desconectado.");
+
 
             connectToIP = GUILayout.TextField(connectToIP, GUILayout.MinWidth(100));
             connectPort = int.Parse(GUILayout.TextField(connectPort.ToString()));
@@ -88,6 +130,7 @@ public class Cliente : MonoBehaviour
     {
         ShowText("", texto, idSala);
         netWorkView.RPC("Comando", RPCMode.Server, idPlayer, texto);
+        textChat = "";
     }
 
     void OnConnectedToServer()
@@ -119,7 +162,6 @@ public class Cliente : MonoBehaviour
             {
                 chatEntries.Add(texto);
             }
-            textChat = "";
         }
     }
 

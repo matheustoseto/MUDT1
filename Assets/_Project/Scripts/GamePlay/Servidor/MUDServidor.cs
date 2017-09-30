@@ -93,7 +93,8 @@ public class MUDServidor : MonoBehaviour {
                 servidorUI.MessageArea += "Inicializando o servidor...\n";
                 Network.InitializeServer(32, connectPort, false);
             }
-        }else
+        }
+        else
         {
             Network.Disconnect(200);
             servidorUI.ConnectMessage = "Servidor: Desativado";
