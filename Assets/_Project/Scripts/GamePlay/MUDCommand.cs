@@ -43,6 +43,12 @@ public class MUDCommand : MonoBehaviour {
 
             if (objeto != null)
             {
+                if (objeto.tipo == TipoObjeto.Mapa)
+                {
+                    servidor.notificaPlayer(player.idPlayer, MUDServidor.mapa);
+                    return;
+                }
+
                 servidor.notificaPlayer(player.idPlayer, objeto.descricao);
                 return;
             }

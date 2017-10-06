@@ -14,6 +14,18 @@ public class MUDServidor : MonoBehaviour {
     private Repositorio repositorio;
     private MUDCommand comandos;
 
+    public static string mapa = "+-------------+   +-------------+   +--------------+   +-------------+\n"
+                          + "|             |   |             |   |              |   |             |\n"
+                          + "|   Taverna   +---+    Vila     +---+   Floresta   +---+   Caverna   |\n"
+                          + "|             |   |             |   |              |   |             |\n"
+                          + "+-------------+   +------+------+   +--------------+   +-------------+\n"
+                          + "                         |                                            \n"
+                          + "                  +------+------+                                     \n"
+                          + "                  |             |                                     \n"
+                          + "                  |    Lago     |                                     \n"
+                          + "                  |             |                                     \n"
+                          + "                  +-------------+                                     \n";
+
     // Use this for initialization
     void Start()
     {
