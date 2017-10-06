@@ -12,6 +12,7 @@ public class MUDCliente : MonoBehaviour
     private string idSala;
     private NetworkView netWorkView;
     public string textChat;
+    private bool setPlayerPrefs = false;
     //private List<string> chatEntries = new List<string>();
 
 
@@ -212,10 +213,14 @@ public class MUDCliente : MonoBehaviour
 			this.idPlayer = idPlayer;
 			this.idSala = idSala;
 
-            clienteUI.AddMessage("Cliente Connectado com sucesso!");
-            clienteUI.AddMessage("NomeSala: " + idSala);
-            clienteUI.AddMessage("NomeJogador: " + playerName);
-            clienteUI.AddMessage("Ping: " + Network.GetAveragePing(Network.connections[0])); 
+            if (!setPlayerPrefs)
+            {
+                clienteUI.AddMessage("Cliente Connectado com sucesso!");
+                clienteUI.AddMessage("NomeSala: " + idSala);
+                clienteUI.AddMessage("NomeJogador: " + playerName);
+                clienteUI.AddMessage("Ping: " + Network.GetAveragePing(Network.connections[0]));
+                setPlayerPrefs = true;
+            }
         }        
     }
 
