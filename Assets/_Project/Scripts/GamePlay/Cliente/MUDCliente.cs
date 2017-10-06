@@ -129,6 +129,7 @@ public class MUDCliente : MonoBehaviour
             netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!");
         Network.Disconnect(200);
         isConectado = false;
+        clienteUI.LogText = "";
     }
 
     /*

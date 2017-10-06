@@ -101,6 +101,8 @@ public class MUDServidor : MonoBehaviour {
             servidorUI.ButtonConnectName = "INICIAR\n"
                                          + "SERVIDOR";
             isConectado = false;
+
+            chatEntries.Clear();
         }
     }
 
@@ -222,6 +224,8 @@ public class MUDServidor : MonoBehaviour {
 
     private void OnDisconnectedFromServer(NetworkDisconnection info)
     {
+        chatEntries.Clear();
+        servidorUI.MessageArea = "";
         Debug.Log("This SERVER OR CLIENT has disconnected from a server");
     }
 
