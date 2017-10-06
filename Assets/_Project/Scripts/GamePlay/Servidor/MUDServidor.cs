@@ -14,9 +14,6 @@ public class MUDServidor : MonoBehaviour {
     private Repositorio repositorio;
     private MUDCommand comandos;
 
-    private bool isConectado = false;
-
-
     // Use this for initialization
     void Start()
     {
@@ -33,22 +30,6 @@ public class MUDServidor : MonoBehaviour {
     void Update()
     {
         // Conectando ao servidor
-        if (!isConectado)
-        {
-            if (Network.peerType == NetworkPeerType.Connecting)
-            {
-                servidorUI.MessageArea += "Conectando...\n";
-            }
-            else if (Network.peerType == NetworkPeerType.Server)
-            {
-                servidorUI.MessageArea += "Servidor inicializado com sucesso!\n";
-                servidorUI.MessageArea += "Conexões: " + Network.connections.Length +"\n";
-                servidorUI.ConnectMessage = "Servidor: Ativado";
-                servidorUI.ButtonConnectName = "DESCONECTAR";
-                isConectado = true;
-            }
-        }
-
         if (Network.peerType == NetworkPeerType.Server)
         {
             servidorUI.QtdConnections = Network.connections.Length;
@@ -83,16 +64,13 @@ public class MUDServidor : MonoBehaviour {
 
     public void ConectarServidor()
     {
-        if (!isConectado)
+        if (Network.peerType == NetworkPeerType.Disconnected)
         {
-            if (Network.peerType == NetworkPeerType.Disconnected)
-            {
-                connectToIP = servidorUI.Address;
-                connectPort = servidorUI.Port;
+            connectToIP = servidorUI.Address;
+            connectPort = servidorUI.Port;
 
-                servidorUI.MessageArea += "Inicializando o servidor...\n";
-                Network.InitializeServer(32, connectPort, false);
-            }
+            servidorUI.MessageArea += "Inicializando o servidor...\n";
+            Network.InitializeServer(32, connectPort, false);
         }
         else
         {
@@ -100,9 +78,6 @@ public class MUDServidor : MonoBehaviour {
             servidorUI.ConnectMessage = "Servidor: Desativado";
             servidorUI.ButtonConnectName = "INICIAR\n"
                                          + "SERVIDOR";
-            isConectado = false;
-
-            chatEntries.Clear();
         }
     }
 
@@ -224,7 +199,6 @@ public class MUDServidor : MonoBehaviour {
 
     private void OnDisconnectedFromServer(NetworkDisconnection info)
     {
-        chatEntries.Clear();
         servidorUI.MessageArea = "";
         Debug.Log("This SERVER OR CLIENT has disconnected from a server");
     }
@@ -242,13 +216,21 @@ public class MUDServidor : MonoBehaviour {
     private void OnServerInitialized()
     {
         Debug.Log("Server initialized and ready");
+
+        servidorUI.MessageArea += "Servidor inicializado com sucesso!\n";
+        servidorUI.MessageArea += "Conexões: " + Network.connections.Length + "\n";
+        servidorUI.ConnectMessage = "Servidor: Ativado";
+        servidorUI.ButtonConnectName = "DESCONECTAR";
     }
 
     private void OnPlayerDisconnected(NetworkPlayer player)
     {
         Debug.Log("Player disconnected from: " + player.ipAddress + ":" + player.port);
 
-        repositorio.players.Remove(comandos.BuscarPlayerByNetwork(player));
+        Player plr = comandos.BuscarPlayerByNetwork(player);
+        NotificaTodosPlayers("", "O jogador " + plr.nome + " desconectou.", comandos.BuscarSalaByIdSala(plr.idSala).nome);
+        AdicionaTextoByIdSala(IdSalas.Sala1, "O jogador " + plr.nome + " desconectou.");
+        repositorio.players.Remove(plr);   
     }
 
     private void OnFailedToConnectToMasterServer(NetworkConnectionError info)

@@ -41,23 +41,8 @@ public class MUDCliente : MonoBehaviour
             }
             else if (Network.peerType == NetworkPeerType.Client)
             {
-                clienteUI.AddMessage("Cliente Connectado com sucesso!");
-                //GUILayout.Label("idPlayer: " + idPlayer);
-                clienteUI.AddMessage("NomeSala: " + idSala);
-                clienteUI.AddMessage("NomeJogador: " + playerName);
-                clienteUI.AddMessage("Ping: " + Network.GetAveragePing(Network.connections[0]));
                 isConectado = true;
-
-                //if (GUILayout.Button("Clear"))
-                //    chatEntries.Clear();
-
-                //textChat = clienteUI.LogText;
-                //textChat = GUILayout.TextField(textChat, GUILayout.MinWidth(100));
-
-                //foreach (string tx in chatEntries)
-                //    clienteUI.LogText = tx;
-                //GUILayout.Label(tx);
-
+                clienteUI.ConnectMessage = "Cliente: Conectado.";
             }
         }
         else
@@ -219,7 +204,12 @@ public class MUDCliente : MonoBehaviour
         if(this.playerName == playerName){
 			this.idPlayer = idPlayer;
 			this.idSala = idSala;
-		}        
+
+            clienteUI.AddMessage("Cliente Connectado com sucesso!");
+            clienteUI.AddMessage("NomeSala: " + idSala);
+            clienteUI.AddMessage("NomeJogador: " + playerName);
+            clienteUI.AddMessage("Ping: " + Network.GetAveragePing(Network.connections[0])); 
+        }        
     }
 
     [RPC]
