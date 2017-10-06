@@ -350,7 +350,7 @@ public class MUDServidor : MonoBehaviour {
     [RPC]
     void SetPlayerPref(string playerName, string idPlayer, string idSala) { }
     [RPC]
-    void ShowText(string nomePlayer, string texto, string idSala) { }
+    void ShowText(string idPlayer, string texto, string idSala) { }
     [RPC]
     void Sendmsg(string idPlayer, string texto, string idSala) { }
     [RPC]
