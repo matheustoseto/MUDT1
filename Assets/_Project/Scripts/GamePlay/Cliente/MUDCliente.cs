@@ -91,6 +91,8 @@ public class MUDCliente : MonoBehaviour
                     Network.useNat = false;
                     Network.Connect(connectToIP, connectPort);
                     clienteUI.ButtonConnectName = "DESCONECTAR";
+                    clienteUI.ReadOnly(true);
+
                 }
                 else
                 {
@@ -115,6 +117,7 @@ public class MUDCliente : MonoBehaviour
         Network.Disconnect(200);
         isConectado = false;
         clienteUI.LogText = "";
+        clienteUI.ReadOnly(false);
     }
 
     /*
@@ -178,9 +181,13 @@ public class MUDCliente : MonoBehaviour
 
     public void ReceberComando()
     {
-        DigitarTexto(clienteUI.Command.text);
-        clienteUI.Command.text = "";
-        clienteUI.Command.Select();
+        if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) && clienteUI.Command.text != "")
+        {
+            DigitarTexto(clienteUI.Command.text);
+            clienteUI.Command.text = "";
+            clienteUI.Command.Select();
+            clienteUI.Command.ActivateInputField();
+        }
     }
 
     void DigitarTexto(string texto)
