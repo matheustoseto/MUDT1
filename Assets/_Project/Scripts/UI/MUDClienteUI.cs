@@ -10,6 +10,7 @@ public class MUDClienteUI : MonoBehaviour {
     [SerializeField] private Text       connectMessage;
     [SerializeField] private Text       buttonConnectName;
     [Header("Command line:")]
+    [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Text       logText;
     [SerializeField] private InputField command;
 
@@ -35,6 +36,11 @@ public class MUDClienteUI : MonoBehaviour {
         logText.text += msg + "\n";
     }
 
+    public void Roll()
+    {
+        Canvas.ForceUpdateCanvases();
+        scrollRect.verticalNormalizedPosition = 0f;
+    }
 
     // Use this for initialization
     void Start()
@@ -45,6 +51,6 @@ public class MUDClienteUI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        
+    }
 }

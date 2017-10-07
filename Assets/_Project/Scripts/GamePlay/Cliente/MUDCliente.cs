@@ -114,7 +114,8 @@ public class MUDCliente : MonoBehaviour
         clienteUI.ButtonConnectName = "Conectar ao\n"
                                      + "SERVIDOR";
         if (!servidorDesconectou)
-            netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!");
+            netWorkView.RPC("ShowText", RPCMode.All, "", "O jogador " + playerName + " desconectou!", idSala);
+
         Network.Disconnect(200);
         isConectado = false;
         clienteUI.LogText = "";
